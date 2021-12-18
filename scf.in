@@ -1,0 +1,32 @@
+&CONTROL
+  calculation = "scf"
+  prefix = "SnSe2" 
+  pseudo_dir = "./"
+  outdir = "./"
+  tstress = .true.
+  tprnfor = .true.
+/
+&SYSTEM
+  ibrav = 0, nat = 3, ntyp = 2
+  occupations = "fixed", 
+  ecutwfc = 60
+/
+&ELECTRONS
+  mixing_mode = "plain"
+  mixing_beta = 0.5
+  startingwfc = "random"
+  conv_thr = 1.0d-8
+/
+CELL_PARAMETERS angstrom
+   1.897003360  -3.285706327   0.000000000
+   1.897003360   3.285706327  -0.000000000
+   0.000000000  -0.000000000   6.061038904
+ATOMIC_SPECIES
+  Sn 118.71 Sn.pbesol-dn-kjpaw_psl.1.0.0.UPF
+  Se 78.96 Se.pbesol-dn-kjpaw_psl.1.0.0.UPF
+ATOMIC_POSITIONS (crystal)
+Sn       0.000000000   0.000000000  -0.000000000
+Se       0.666667000   0.333333000   0.737721199
+Se       0.333333000   0.666667000   0.262278801
+K_POINTS (automatic)
+  6 6 3 0 0 0

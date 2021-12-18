@@ -1,0 +1,7 @@
+**/.ipynb_checkpoints/
+.ipynb_checkpoints/
+kat/qe-6.8
+kat/.*
+simtool/qe6.8/
+RUNS/
+.submit.log

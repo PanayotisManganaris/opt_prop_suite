@@ -49,3 +49,41 @@ obtain and add to dataframe:
 - cutoff frequency
   - the at maximum of final peak (see optprop for optimizer)
 get DOS, phonon dispersion, optical spectra
+* declaring in/out
+** in
+structures (matproj POSCARS, ciffs, etc)
+** out
+*** TODO phonon properties -- PREPARE THESE FOR A DEMO
+Phonon spectra
+IR spectra
+Raman spectra
+IR cutoff
+*** electronic properties
+fermi energy
+Bandgap
+eDoS
+UV cutoff
+absorption coefficient vs phonon
+SLME
+PV_FOM
+* User Convenience ideas
+demonstrate that postprocessing options are available buy
+automatically generating interactive high quality spectral figures
+** provide additional analysis simtool
+provide filtering on the nanohub RUNS db RAW DATA
+
+notice -- .wfc files and wfc.dat files should be removed
+* simulator details
+everything running in open source quantum espresso
+* simtool realities
+simtool outputs that fail to deliver stop the simtool from hashing
+
+so, limit the outputs so that the user gets their information in the
+vast majority of cases
+
+Internally, our simtool should provide some diagnosis of every run
+that is provided to the user in a comprehensive logfile
+* manuscript accompanying tool
+primer on robust optical property calculation, physical assessment of
+computational products, and best practices in data management
+

@@ -1,0 +1,8 @@
+#!/bin/sh
+
+#
+# simtool
+#
+/usr/bin/invoke_app "$@" -t 670raman \
+                         -C "start_jupyter -t -T @tool 670ramanExample.ipynb" \
+                         -u anaconda-6

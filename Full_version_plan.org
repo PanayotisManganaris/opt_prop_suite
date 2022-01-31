@@ -42,8 +42,7 @@ seekpath lib for more powerful tool
 ** 
 * Analysis tools
 :properites:
-kat so far
-Paul takeover
+Kat
 :end:
 obtain and add to dataframe:
 - cutoff frequency
@@ -67,7 +66,7 @@ absorption coefficient vs phonon
 SLME
 PV_FOM
 * User Convenience ideas
-demonstrate that postprocessing options are available buy
+demonstrate that postprocessing options are available by
 automatically generating interactive high quality spectral figures
 ** provide additional analysis simtool
 provide filtering on the nanohub RUNS db RAW DATA

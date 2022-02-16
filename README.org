@@ -63,7 +63,7 @@ Finally, use poetry to install the opt_prop_suite dependencies.
   git clone https://github.com/PanayotisManganaris/opt_prop_suite.git
   poetry install
 #+end_src
-n
+
 then launch compute_spectra_workflow.ipynb to use the simtool.
 ** Adding Dependencies
 Packaging is the easiest way to make python development portable
@@ -71,13 +71,15 @@ because the environment can simply be committed with the rest of the
 repository.
 
 If in the course of development you require packages not defined in
-the pyproject.toml you must install them using poetry.
+the pyproject.toml you must install them using poetry. This will take
+care of updating the configuration file and install the dependency.
 
 #+begin_src bash
-  poetry install <package_name>
+  poetry add <package_name>
 #+end_src
 
-Then regenerate the poetry.lock file and commit both back to the repository. 
+Then commit the poetry.lock and pyproject.toml both back to the
+repository to share the dependency with other developers.
 * Tasks Division
 ** everyone
 contribute runs to "successes and failures" presentation
@@ -100,6 +102,7 @@ qgrid apparently is a big hassle to install on nanohub? user databrowser gui bas
 
 *** Obtain Results
 500-700 sample structures chosen by Shivam
+get cutoff frequency at the maximum of final peak (see optprop for optimizer)
 *** Optimize Kpath meshing
 for Raman Computation
 - [ ] SeekPath vs pwtools?
@@ -116,47 +119,21 @@ senior author: Dr.Ale Strachan, Dr. Arun Kanakkithodi
 acknowledgements: Yuxuan Zhang for initial IR spectra
 [2022-01-19 Wed]
 Joji
-- cutoff frequency
-  - the at maximum of final peak (see optprop for optimizer)
 get DOS, phonon dispersion, optical spectra
 * declaring in/out
 ** in
 structures (matproj POSCARS, ciffs, etc)
+
+critically, make sure any irregular inputs can be indexed when all is
+said and done
+
 ** out
-*** TODO phonon properties -- PREPARE THESE FOR A DEMO
-Phonon spectra
-IR spectra
-Raman spectra
-IR cutoff
-*** electronic properties
-fermi energy
-Bandgap
-eDoS
-UV cutoff
-absorption coefficient vs phonon
-SLME
-PV_FOM
-* User Convenience ideas
-demonstrate that postprocessing options are available by
-automatically generating interactive high quality spectral figures
-** provide additional analysis simtool
-provide filtering on the nanohub RUNS db RAW DATA
-
 notice -- .wfc files and wfc.dat files should be removed
-* simulator details
-everything running in open source quantum espresso
-* simtool realities
-simtool outputs that fail to deliver stop the simtool from hashing
 
-so, limit the outputs so that the user gets their information in the
-vast majority of cases
+double critical: if an output is not recorded, the simtool will fail to hash
 
-Internally, our simtool should provide some diagnosis of every run
-that is provided to the user in a comprehensive logfile
-* manuscript accompanying tool
-primer on robust optical property calculation, physical assessment of
-computational products, and best practices in data management
-* Queryable Output
+more outputs == more chances that work will need to be repeated
+
 User Queries have to work on the outputs
 - all indexable strucutre/chemistries
   - chemical
@@ -169,6 +146,15 @@ User Queries have to work on the outputs
 - stress
 - phonon dispersion
 - raman/IR
+  - IR cutoff
+- fermi energy
+- Bandgap
+- eDoS
+- UV cutoff
+- absorption coefficient vs phonon
+- SLME
+- PV_FOM
+* Minutia of Simulation Settings
 ** cell vs atomic relaxation
 to enable study of strain effects on optical properties, we offer the
 option to run the simulation pipline with OR without an initial VC-relaxation
@@ -178,3 +164,7 @@ option to run the simulation pipline with OR without an initial VC-relaxation
 always do atomic/force relax relaxation and let the user decide which 
 ** detailed breakdown of computational shortcomings
 dft related issues presentation.
+* User Instructions
+** optical property calculation
+** assessing results
+** data management

@@ -23,6 +23,17 @@ This Jupyter Notebook Simtool is intended for publication on
 Nanohub.org where it will be user facing
 
 User and Developer dependencies are stated in pyproject.toml
+
+*NOTICE: THE NANOHUB INSTALLATION INSTRUCTIONS ARE NOT YET MATURE.*
+THIS TOOL REQUIRES DEPENDENCIES NOT FULLY PROVIDED BY THE ANACONDA-6
+BASE ENVIRONMENT PROVIDED TO ALL USERS. I'm working on it....
+
+The main problems:
+- GLIBC is still not accessable by user defined environments
+- Any given user defined environment needs to define a jupyter kernel
+  in order to be useable from the web interface.
+  - for some reason, the link cannot be established. This may just be due to the absence of glibc bindings.
+  
 ** Local Installation
 To install and contribute to the development version on any system
 simply clone the repository to a suitable working directory. Then,
@@ -30,11 +41,9 @@ either use your environment manager of choice to install poetry or let
 poetry define its own virtual environment and then execute poetry
 install in the repo root.
 
-You should not need to use conda to install the C toolchain in this
-case.
-
-In this case, you cannot test run the simtool itself short of setting
-up a slurm server yourself.
+In this case, the python dependencies should work, however you cannot
+test run the simtool short of setting up a hubzero server with quantum
+espresso yourself.
 ** Nanohub Installation
 The simtool is designed to utilize nanohub's HPC resources in running
 quantum espresso DFT simulation by submitting runs via python hublib's
@@ -45,8 +54,8 @@ environment, launch a terminal under the "new" menu in the jupyter
 browser and navigate to a preferred working directory, Then create a
 conda virtual environment. I call mine "ops" for opt_prop_suite.
 
-Populate the environment with the c tool chain and python core
-libraries. Then use pip to install poetry.
+Populate the environment with glib from conda forge (this includes
+functioning python core libraries). Then use pip to install poetry.
 
 #+begin_src bash
   conda create --name ops -c conda-forge glib
@@ -58,6 +67,9 @@ Then, clone the repository to a suitable working directory in your
 nanohub home.
 
 Finally, use poetry to install the opt_prop_suite dependencies.
+
+The dependencies do take up a fair fraction of the 10GB nanohub users
+are allocated.
 
 #+begin_src bash
   git clone https://github.com/PanayotisManganaris/opt_prop_suite.git
@@ -72,7 +84,8 @@ repository.
 
 If in the course of development you require packages not defined in
 the pyproject.toml you must install them using poetry. This will take
-care of updating the configuration file and install the dependency.
+care of updating the configuration file and install the (exclusively
+pypi) dependency.
 
 #+begin_src bash
   poetry add <package_name>

@@ -29,9 +29,9 @@ THIS TOOL REQUIRES DEPENDENCIES NOT FULLY PROVIDED BY THE ANACONDA-6
 BASE ENVIRONMENT PROVIDED TO ALL USERS. I'm working on it....
 
 The main problems:
-- GLIBC is still not accessable by user defined environments
+- GLIBC is still not accessible by user defined environments
 - Any given user defined environment needs to define a jupyter kernel
-  in order to be useable from the web interface.
+  in order to be usable from the web interface.
   - for some reason, the link cannot be established. This may just be due to the absence of glibc bindings.
   
 ** Local Installation

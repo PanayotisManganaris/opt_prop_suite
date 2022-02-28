@@ -5,3 +5,4 @@ kat/.*
 simtool/qe6.8/
 RUNS/
 .submit.log
+.ftpconfig

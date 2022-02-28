@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "opt_prop_suite"
+version = "0.0.7"
+description = "Nanohub based virtual lab for design, execution, and analysis of computational experiments testing the optical properties of semiconductors. Runs Quantum Espresso DFT code."
+authors = ["Panayotis Manganaris <panos.manganaris@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+simtool = "^0.3.3"
+pandas = "^1.4.1"
+matplotlib = "^3.5.1"
+qgrid = "^1.3.1"
+hublib = "^0.9.96"
+pymatgen = "^2022.2.10"
+pybel = "^0.15.5"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

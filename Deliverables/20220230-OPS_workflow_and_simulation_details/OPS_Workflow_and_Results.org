@@ -35,9 +35,9 @@
 
 * Results
 ** Kat
-I'm not going to dig too much into beamer / org-mode formatting here, so I'm just adding my contributions here since I can't preview at the moment
+I'm not going to dig too much into beamer / org-mode formatting, so I'm just adding my contributions here since I can't preview at the moment
 - for ZnO (mpid = 2133), outputs are EXTREMELY sensitive to input choices
-  - ecutwfc = 50 Ry
+  - ecutwfc = 50 Ry, 1 node
   | KPOINTS |       output         |
   |---------+----------------------|
   |    3    |         Y            |
@@ -45,22 +45,25 @@ I'm not going to dig too much into beamer / org-mode formatting here, so I'm jus
   |    9    | N (walltime reached) |
   |    12   | N (walltime reached) |
   |    15   | N (walltime reached) |
-
-  - ecutwfc = 60 Ry (is this too high? ~800 eV, but 'recommended')
+  - ecutwfc = 50 Ry, 4 nodes (waiting on results)
+  | KPOINTS |       output         |
+  |---------+----------------------|
+  |    3    |          Y           |
+  |    6    |                      |
+  |    9    |                      |
+  |    12   |                      |
+  |    15   |                      |
+  - ecutwfc = 60 Ry, 4 nodes (is this too high? ~800 eV, but 'recommended')
   | KPOINTS |       output         |
   |---------+----------------------|
   |    3    |  N (vc-relax fails)  |
   |    6    |  N (vc-relax fails)  |
   |    9    |  N (vc-relax fails)  |
-
-  - ecutwfc = 40 Ry (waiting)
+  - ecutwfc = 40 Ry, 4 nodes (waiting)
   | KPOINTS |       output         |
   |---------+----------------------|
   |    3    |          Y           |
   |    6    |  N (vc-relax fails)  |
-  |    9    |                      |
-  |    12   |                      |
-  |    15   |                      |
-
+  |    9    |  N (vc-relax fails)  |
 - trying other structures would be useful as well, but I'm currently very limited by storage space in nanoHUB
   - each (successful) simulation takes up 1-2 GB in storage?

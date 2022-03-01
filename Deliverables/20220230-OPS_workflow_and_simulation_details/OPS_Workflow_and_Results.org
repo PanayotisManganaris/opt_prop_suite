@@ -29,6 +29,38 @@
 * Input
 ** Declarations
 *** Strucutre Processing
-*** 
+***
 * Output
 ** Declarations and
+
+* Results
+** Kat
+I'm not going to dig too much into beamer / org-mode formatting here, so I'm just adding my contributions here since I can't preview at the moment
+- for ZnO (mpid = 2133), outputs are EXTREMELY sensitive to input choices
+  - ecutwfc = 50 Ry
+  | KPOINTS |       output         |
+  |---------+----------------------|
+  |    3    |         Y            |
+  |    6    |N (smearing is needed)|
+  |    9    | N (walltime reached) |
+  |    12   | N (walltime reached) |
+  |    15   | N (walltime reached) |
+
+  - ecutwfc = 60 Ry (is this too high? ~800 eV, but 'recommended')
+  | KPOINTS |       output         |
+  |---------+----------------------|
+  |    3    |  N (vc-relax fails)  |
+  |    6    |  N (vc-relax fails)  |
+  |    9    |  N (vc-relax fails)  |
+
+  - ecutwfc = 40 Ry (waiting)
+  | KPOINTS |       output         |
+  |---------+----------------------|
+  |    3    |          Y           |
+  |    6    |  N (vc-relax fails)  |
+  |    9    |                      |
+  |    12   |                      |
+  |    15   |                      |
+
+- trying other structures would be useful as well, but I'm currently very limited by storage space in nanoHUB
+  - each (successful) simulation takes up 1-2 GB in storage?

@@ -53,9 +53,8 @@ class Authenticate:
 
 class QuerySuite:
     """widgets for making queries -- might want to try implementing OPTIMATE?"""
-    def __init__(self, ):
-        
-    def plot_selected(self):
+    @staticmethod
+    def plot_selected():
         # import POSCAR file
     
         struct = rester.get_structure_by_material_id(mpid, final = False, conventional_unit_cell=True)

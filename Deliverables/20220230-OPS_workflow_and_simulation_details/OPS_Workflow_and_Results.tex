@@ -1,4 +1,4 @@
-% Created 2022-03-02 Wed 12:25
+% Created 2022-03-09 Wed 10:36
 % Intended LaTeX compiler: pdflatex
 \documentclass[8pt, compress]{beamer}
 \usepackage[utf8]{inputenc}
@@ -39,8 +39,8 @@
 \end{frame}
 
 \section{Input/Output}
-\label{sec:org2e01971}
-\begin{frame}[label={sec:org096a648},fragile]{Inputs}
+\label{sec:org6ff28c5}
+\begin{frame}[label={sec:org505ba05},fragile]{Inputs}
  \begin{columns}
 \begin{column}{0.3\columnwidth}
 \begin{block}{Structure Selection}
@@ -115,26 +115,45 @@ Outputs can be queried by key and filtered by conditional matching on values
 \item[{$\boxminus$}] spectra
 \begin{itemize}
 \item[{$\boxtimes$}] raman/IR
-\item[{$\square$}] eDoS
+\item[{$\square$}] eDoS + Band-structure
 \item[{$\square$}] phonon dispersion
 \item[{$\square$}] SLME (these might be relegated to post processing)
 \item[{$\square$}] PV FOM
 \end{itemize}
 \end{itemize}
 \end{block}
-\begin{block}{Fallbacks}
-\end{block}
 \end{frame}
-
 \section{Results}
-\label{sec:org17c9ad4}
-\begin{frame}[allowframebreaks]{Kat's Troubleshooting}
+\label{sec:orgeebf0b9}
+\begin{frame}[allowframebreaks]{Kat's Troubleshooting in ZnO (mpid = 2133)}
 Detailed breakdown of simulation shortcomings
 \begin{itemize}
 \item Testing workflow for ZnO (mpid = 2133)
 \item outputs are \alert{extremely} sensitive to input choices
 \item trying other structures would be useful as well
 \end{itemize}
+\begin{block}{ecutwfc = 40 Ry, 4 nodes}
+\begin{center}
+\begin{tabular}{rl}
+KPOINTS & output\\
+\hline
+3 & Y\\
+6 & N (vc-relax fails)\\
+9 & N (vc-relax fails)\\
+\end{tabular}
+\end{center}
+\end{block}
+\begin{block}{ecutwfc = 40 Ry, 8 nodes}
+\begin{center}
+\begin{tabular}{rl}
+KPOINTS & output\\
+\hline
+3 & Y\\
+6 & N (vc-relax fails)\\
+9 & N (vc-relax fails)\\
+\end{tabular}
+\end{center}
+\end{block}
 \begin{block}{ecutwfc = 50 Ry, 1 node}
 \begin{center}
 \begin{tabular}{rl}
@@ -154,10 +173,10 @@ KPOINTS & output\\
 KPOINTS & output\\
 \hline
 3 & Y\\
-6 & \\
-9 & \\
-12 & \\
-15 & \\
+6 & N (vc-relax fails)\\
+9 & Y\\
+12 & N (walltime reached)\\
+15 & N (walltime reached)\\
 \end{tabular}
 \end{center}
 \end{block}
@@ -173,6 +192,8 @@ KPOINTS & output\\
 \end{tabular}
 \end{center}
 \end{block}
+\end{frame}
+\begin{frame}[allowframebreaks]{Kat's Troubleshooting in SiC (mpid = 1002206)}
 \begin{block}{ecutwfc = 40 Ry, 4 nodes}
 \begin{center}
 \begin{tabular}{rl}
@@ -185,19 +206,52 @@ KPOINTS & output\\
 \end{center}
 \end{block}
 \end{frame}
+\begin{frame}[allowframebreaks]{Convergence Plots}
+\begin{block}{Convergence for 3 Kpoints}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=180]{/home/panos/src/opt_prop_suite/convergence_plots/SiC_E40_K3.png}
+\caption{\label{fig:Sice40k3} convergence trend at ecutwfc = 40 Ry}
+\end{figure}
+\end{block}
+\begin{block}{9 Kpoints fails to make any ionic iteration in vcrelax}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=180]{/home/panos/src/opt_prop_suite/convergence_plots/SiC_E40_K9.png}
+\caption{\label{fig:Sice40k9} unfortunately blank at ecutwfc = 40 Ry}
+\end{figure}
+\end{block}
+\end{frame}
+\begin{frame}[label={sec:org5a679bd}]{Discussion}
+\begin{itemize}
+\item each (successful) simulation takes up 1-2 GB in storage?
+\item why are they failing to converge?
+\begin{itemize}
+\item vcrelax final scf calculation fails to converge, even after 1000 electronic steps
+\begin{itemize}
+\item only one ionic step
+\end{itemize}
+\item "The maximum number of steps has been reached."
+\end{itemize}
+\item cell shape changes drastically (due to no symmetry?)
+\begin{itemize}
+\item we've not yet attempted replacing vc relax with atomic relax in the pipeline
+\end{itemize}
+\end{itemize}
+\end{frame}
 \section{Logistics}
-\label{sec:org2b00c41}
-\begin{frame}[label={sec:org44d2fef}]{Runs Storage}
-dft related issues presentation.
-
+\label{sec:org01d6653}
+\begin{frame}[label={sec:orge7dbfa6}]{Run DB}
+\begin{block}{Run Storage and Parallelization Technical Points}
 \begin{itemize}
 \item Currently very limited by storage space in nanoHUB
 \item Each (successful) simulation takes up 1-2 GB in storage?
 \item it may be desirable to reimplement the simtool via a pegasus workflow
 \begin{itemize}
-\item enabling improved job parallelization?
-\item enabling more detailed data management?
+\item may enable improved job parallelization
+\item enables more detailed data management
 \end{itemize}
 \end{itemize}
+\end{block}
 \end{frame}
 \end{document}

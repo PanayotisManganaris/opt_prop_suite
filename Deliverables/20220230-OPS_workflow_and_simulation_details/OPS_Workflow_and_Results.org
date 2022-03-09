@@ -108,7 +108,7 @@ Outputs can be queried by key and filtered by conditional matching on values
   - [ ] UV cutoff
 - [-] spectra
   - [X] raman/IR
-  - [ ] eDoS
+  - [ ] eDoS + Band-structure
   - [ ] phonon dispersion
   - [ ] SLME (these might be relegated to post processing)
   - [ ] PV FOM
@@ -120,7 +120,7 @@ Note: these returns are probably conditional on the pipeline...
 - [ ] tensors -- enabling analysis of optical response to strain effect
   - [ ] forces
   - [ ] stress
-*** Fallbacks                                                     :B_block:
+*** COMMENT Fallbacks                                                     :B_block:
 :PROPERTIES:
 :BEAMER_env: block
 :END:
@@ -199,7 +199,25 @@ Is this too high? ~800 eV, but 'recommended'...
 |       3 | Y                  |
 |       6 | N (vc-relax fails) |
 |       9 | N (vc-relax fails) |
-*** 
+** Convergence Plots                                               :B_frame:
+:PROPERTIES:
+:BEAMER_env: frame
+:BEAMER_opt: allowframebreaks
+:END:
+*** Convergence for 3 Kpoints                                     :B_block:
+:PROPERTIES:
+:BEAMER_env: block
+:END:
+#+caption: label:fig:Sice40k3 convergence trend at ecutwfc = 40 Ry
+#+attr_latex: :width 180
+[[file:~/src/opt_prop_suite/convergence_plots/SiC_E40_K3.png]]
+*** 9 Kpoints fails to make any ionic iteration in vcrelax        :B_block:
+:PROPERTIES:
+:BEAMER_env: block
+:END:
+#+caption: label:fig:Sice40k9 unfortunately blank at ecutwfc = 40 Ry
+#+attr_latex: :width 180
+[[file:~/src/opt_prop_suite/convergence_plots/SiC_E40_K9.png]]
 ** Discussion                                                      :B_frame:
 :PROPERTIES:
 :BEAMER_env: frame
@@ -212,15 +230,16 @@ Is this too high? ~800 eV, but 'recommended'...
 - cell shape changes drastically (due to no symmetry?)
   - we've not yet attempted replacing vc relax with atomic relax in the pipeline
 * Logistics
-** Runs Storage                                                    :B_frame:
+** Run DB                                                  :B_frame:
 :PROPERTIES:
 :BEAMER_env: frame
 :END:
-
-dft related issues presentation.
-
+*** Run Storage and Parallelization Technical Points              :B_block:
+:PROPERTIES:
+:BEAMER_env: block
+:END:
 - Currently very limited by storage space in nanoHUB
 - Each (successful) simulation takes up 1-2 GB in storage?
 - it may be desirable to reimplement the simtool via a pegasus workflow
-  - enabling improved job parallelization?
-  - enabling more detailed data management?
+  - may enable improved job parallelization
+  - enables more detailed data management

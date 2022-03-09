@@ -169,6 +169,11 @@ class InputSuite():
             tooltip='run to submit qe simtool'
         )
         self.button.on_click(self._on_button_clicked)
+        self.storage = widgets.Select(
+            options=["none", "nowf", "low", "medium"],
+            value="none",
+            description='wfn + dat files to save:',
+        )
         self.ecutwfc = widgets.BoundedFloatText(
             value=50,
             min=50,

@@ -120,11 +120,20 @@ Note: these returns are probably conditional on the pipeline...
 - [ ] tensors -- enabling analysis of optical response to strain effect
   - [ ] forces
   - [ ] stress
+
 *** COMMENT Fallbacks                                                     :B_block:
 :PROPERTIES:
 :BEAMER_env: block
 :END:
 
+* COMMENT Validation
+** TODO Check Units
+** Run validation structures
+*** Diamond-zincblende
+**** [#1] Si
+**** [#3] Zn Su
+**** Oxides are hard
+** TODO XC functional -- should be a choice like pseudo-potential
 * Results
 ** Kat's Troubleshooting in ZnO (mpid = 2133)                      :B_frame:
 :PROPERTIES:

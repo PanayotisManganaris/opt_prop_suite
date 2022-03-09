@@ -126,7 +126,7 @@ Note: these returns are probably conditional on the pipeline...
 :END:
 
 * Results
-** Kat's Troubleshooting                                           :B_frame:
+** Kat's Troubleshooting in ZnO (mpid = 2133)                      :B_frame:
 :PROPERTIES:
 :BEAMER_env: frame
 :BEAMER_opt: allowframebreaks
@@ -135,6 +135,24 @@ Detailed breakdown of simulation shortcomings
 - Testing workflow for ZnO (mpid = 2133)
 - outputs are *extremely* sensitive to input choices
 - trying other structures would be useful as well
+*** ecutwfc = 40 Ry, 4 nodes                                      :B_block:
+:PROPERTIES:
+:BEAMER_env: block
+:END:
+| KPOINTS | output             |
+|---------+--------------------|
+|       3 | Y                  |
+|       6 | N (vc-relax fails) |
+|       9 | N (vc-relax fails) |
+*** ecutwfc = 40 Ry, 8 nodes                                      :B_block:
+:PROPERTIES:
+:BEAMER_env: block
+:END:
+| KPOINTS |       output         |
+|---------+----------------------|
+|    3    |          Y           |
+|    6    |  N (vc-relax fails)  |
+|    9    |  N (vc-relax fails)  |
 *** ecutwfc = 50 Ry, 1 node                                       :B_block:
 :PROPERTIES:
 :BEAMER_env: block
@@ -146,17 +164,17 @@ Detailed breakdown of simulation shortcomings
 |       9 | N (walltime reached)   |
 |      12 | N (walltime reached)   |
 |      15 | N (walltime reached)   |
-*** TODO ecutwfc = 50 Ry, 4 nodes                                 :B_block:
+*** ecutwfc = 50 Ry, 4 nodes                                      :B_block:
 :PROPERTIES:
 :BEAMER_env: block
 :END:
-| KPOINTS | output |
-|---------+--------|
-|       3 | Y      |
-|       6 |        |
-|       9 |        |
-|      12 |        |
-|      15 |        |
+| KPOINTS | output               |
+|---------+----------------------|
+|       3 | Y                    |
+|       6 | N (vc-relax fails)   |
+|       9 | Y                    |
+|      12 | N (walltime reached) |
+|      15 | N (walltime reached) |
 *** ecutwfc = 60 Ry, 4 nodes                                      :B_block:
 :PROPERTIES:
 :BEAMER_env: block
@@ -167,6 +185,11 @@ Is this too high? ~800 eV, but 'recommended'...
 |       3 | N (vc-relax fails) |
 |       6 | N (vc-relax fails) |
 |       9 | N (vc-relax fails) |
+** Kat's Troubleshooting in SiC (mpid = 1002206)                   :B_frame:
+:PROPERTIES:
+:BEAMER_env: frame
+:BEAMER_opt: allowframebreaks
+:END:
 *** ecutwfc = 40 Ry, 4 nodes                                      :B_block:
 :PROPERTIES:
 :BEAMER_env: block
@@ -176,6 +199,18 @@ Is this too high? ~800 eV, but 'recommended'...
 |       3 | Y                  |
 |       6 | N (vc-relax fails) |
 |       9 | N (vc-relax fails) |
+*** 
+** Discussion                                                      :B_frame:
+:PROPERTIES:
+:BEAMER_env: frame
+:END:
+- each (successful) simulation takes up 1-2 GB in storage?
+- why are they failing to converge?
+  - vcrelax final scf calculation fails to converge, even after 1000 electronic steps
+    - only one ionic step
+  - "The maximum number of steps has been reached."
+- cell shape changes drastically (due to no symmetry?)
+  - we've not yet attempted replacing vc relax with atomic relax in the pipeline
 * Logistics
 ** Runs Storage                                                    :B_frame:
 :PROPERTIES:
@@ -189,5 +224,3 @@ dft related issues presentation.
 - it may be desirable to reimplement the simtool via a pegasus workflow
   - enabling improved job parallelization?
   - enabling more detailed data management?
-* new material
-

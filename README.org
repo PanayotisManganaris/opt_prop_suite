@@ -156,9 +156,8 @@ User Queries have to work on the outputs
   - chemical
   - mpid
   - spacegroup
-  - bandgap -- if we get it
-  - energy
-  - charge densities
+- energy
+- charge densities
 - forces
 - stress
 - phonon dispersion
@@ -179,8 +178,6 @@ option to run the simulation pipline with OR without an initial VC-relaxation
 "check" flag which can reassure user of "reasonable" structures.
 *** alternatively:
 always do atomic/force relax relaxation and let the user decide which
-** detailed breakdown of computational shortcomings
-dft related issues presentation.
 * User Instructions
 ** optical property calculation
 ** assessing results

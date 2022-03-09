@@ -133,7 +133,15 @@ Note: these returns are probably conditional on the pipeline...
 **** [#1] Si
 **** [#3] Zn Su
 **** Oxides are hard
+**** Don't trust anybody
+materials project doesn't always have good structures. In fact, there
+are a fair few bad structures due to historical bugs in cif file conversions
+
+so. Verify Everything. Trust Nothing.
 ** TODO XC functional -- should be a choice like pseudo-potential
+** 
+
+
 * Results
 ** Kat's Troubleshooting in ZnO (mpid = 2133)                      :B_frame:
 :PROPERTIES:

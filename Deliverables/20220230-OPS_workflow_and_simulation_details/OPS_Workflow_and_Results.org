@@ -128,6 +128,13 @@ Note: these returns are probably conditional on the pipeline...
 
 * COMMENT Validation
 ** TODO Check Units
+Oh bloody hell. (alat) is literally use the A lattice parameter as the
+standard unit.  (alat = 1.00) is literally just consider A to
+be 1. That way, if the input is in ang, bohr, or whatever and A = 5
+[whatevers], then the unit is implicit.
+
+This might be nonsense for calculations that actually depend on
+knowing the magnitude of forces, and not just their rates of change?
 ** Run validation structures
 *** Diamond-zincblende
 **** [#1] Si
@@ -139,9 +146,9 @@ are a fair few bad structures due to historical bugs in cif file conversions
 
 so. Verify Everything. Trust Nothing.
 ** TODO XC functional -- should be a choice like pseudo-potential
-** 
-
-
+pw.x keyword: input_dft -- preferably an optional input
+if "not supplied" the dft functional used is that read from the pp.
+it's an expert setting
 * Results
 ** Kat's Troubleshooting in ZnO (mpid = 2133)                      :B_frame:
 :PROPERTIES:

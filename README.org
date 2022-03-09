@@ -108,6 +108,8 @@ contribute runs to "successes and failures" presentation
 *** Frontend Presentation
 - [ ] read only notebook?
 - [ ] rappture toolkit (do we want to pursue this option?)
+*** Run output dataframe
+- [ ] add script that extracts outputs / checks convergence and adds result to df
 supposedly works to auto-generate guis similarly to how
 simtool auto-generates databases?
 - [X] hide code blocks

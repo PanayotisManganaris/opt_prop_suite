@@ -189,3 +189,5 @@ dft related issues presentation.
 - it may be desirable to reimplement the simtool via a pegasus workflow
   - enabling improved job parallelization?
   - enabling more detailed data management?
+* new material
+

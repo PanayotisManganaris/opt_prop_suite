@@ -37,6 +37,19 @@
 ** Kat
 I'm not going to dig too much into beamer / org-mode formatting, so I'm just adding my contributions here since I can't preview at the moment
 - for ZnO (mpid = 2133), outputs are EXTREMELY sensitive to input choices
+- "vc-relax fails" = failed to converge
+  - ecutwfc = 40 Ry, 4 nodes
+  | KPOINTS |       output         |
+  |---------+----------------------|
+  |    3    |          Y           |
+  |    6    |  N (vc-relax fails)  |
+  |    9    |  N (vc-relax fails)  |
+  - ecutwfc = 40 Ry, 8 nodes
+  | KPOINTS |       output         |
+  |---------+----------------------|
+  |    3    |          Y           |
+  |    6    |  N (vc-relax fails)  |
+  |    9    |  N (vc-relax fails)  |
   - ecutwfc = 50 Ry, 1 node6
   | KPOINTS |       output         |
   |---------+----------------------|
@@ -45,7 +58,7 @@ I'm not going to dig too much into beamer / org-mode formatting, so I'm just add
   |    9    | N (walltime reached) |
   |    12   | N (walltime reached) |
   |    15   | N (walltime reached) |
-  - ecutwfc = 50 Ry, 4 nodes (waiting on results)
+  - ecutwfc = 50 Ry, 4 nodes
   | KPOINTS |       output         |
   |---------+----------------------|
   |    3    |          Y           |
@@ -53,17 +66,22 @@ I'm not going to dig too much into beamer / org-mode formatting, so I'm just add
   |    9    |          Y           |
   |    12   | N (walltime reached) |
   |    15   | N (walltime reached) |
-  - ecutwfc = 60 Ry, 4 nodes (is this too high? ~800 eV, but 'recommended')
+  - ecutwfc = 60 Ry, 4 nodes
   | KPOINTS |       output         |
   |---------+----------------------|
   |    3    |  N (vc-relax fails)  |
   |    6    |  N (vc-relax fails)  |
   |    9    |  N (vc-relax fails)  |
-  - ecutwfc = 40 Ry, 4 nodes (waiting)
+- for SiC (mpid = 1002206)
+  - ecutwfc = 40 Ry, 4 nodes
   | KPOINTS |       output         |
   |---------+----------------------|
   |    3    |          Y           |
   |    6    |  N (vc-relax fails)  |
   |    9    |  N (vc-relax fails)  |
-- trying other structures would be useful as well, but I'm currently very limited by storage space in nanoHUB
-  - each (successful) simulation takes up 1-2 GB in storage?
+- each (successful) simulation takes up 1-2 GB in storage?
+- why are they failing to converge?
+  - vcrelax final scf calculation fails to converge, even after 1000 electronic steps
+    - only one ionic step
+  - "The maximum number of steps has been reached."
+  - cell shape changes drastically (due to no symmetry?)

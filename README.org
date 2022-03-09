@@ -107,9 +107,10 @@ contribute runs to "successes and failures" presentation
 - [X] Widget Based User GUI (added non-widget iterative section, need to implement iterative widgets)
 *** Frontend Presentation
 - [ ] read only notebook?
-- [ ] rappture toolkit
-  supposedly works to auto-generate guis similarly to how
-  simtool auto-generates databases?
+- [ ] rappture toolkit (do we want to pursue this option?)
+supposedly works to auto-generate guis similarly to how
+simtool auto-generates databases?
+- [X] hide code blocks
 ** Panos
 *** Standardize Development Environment
 qgrid apparently is a big hassle to install on nanohub? user databrowser gui based on it

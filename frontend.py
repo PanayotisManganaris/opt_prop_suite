@@ -15,7 +15,7 @@ import plotly.express as px
 import ipywidgets as widgets
 from IPython.display import display, Javascript, clear_output
 
-class Authenticate:
+class Authenticate():
     """
     Container class for user authentication functions
 
@@ -28,8 +28,20 @@ class Authenticate:
     (current remote query apps work only through MP anyway)
     (look into OPTIMATE?)
     """
+    def __init__(self):
+        self.checkmp = os.path.isfile(os.path.expanduser("~/.mpkey.txt"))
+
+    def mpkey(self):
+        """
+        ask user for authentication if they are not already authorized
+        """
+        if self.checkmp:
+            pass
+        else:
+            self._mpkey()
+
     @staticmethod
-    def mpkey():
+    def _mpkey():
         """
         write user's materials project key to a file which can be
         accessed by later instances of MPRester. Delete key from
@@ -50,62 +62,109 @@ class Authenticate:
         except:
             print("Something seems wrong with your key")
 
-class QuerySuite:
-    """widgets for making queries -- might want to try implementing OPTIMATE?"""
+class MPQuery():
+    """ might want to try implementing OPTIMATE """
+    def __init__(self, content=[], **kwargs):
+        """current stopgap:
+        if OPTIMATE is hard to implement, just make case-by-case query
+        object with the following API
+
+        authentication is pulled from the user's filesystem to offload security onto them...
+        frame returns a dataframe of requested values
+        """
+        self.authfile = kwargs.get('authfile', "~/.mpkey.txt")
+        self.query = kwargs.get('query', ({ "crystal_system": "cubic"},
+                                          ["task_id","pretty_formula","formula",
+                                           "elements","e_above_hull", "spacegroup.number",
+                                           "band_gap", "crystal_system"]))
+        self.rester = self._make_rester()
+        self.frame = pd.DataFrame(self.get_content(content)) #mutable
+
+    def _make_rester(self):
+        with open(os.path.expanduser(self.authfile), "r+") as file:
+            apikey = file.readline()
+        return MPRester(apikey) #investigate other apis, plug and play?... make a function probably. OPTIMATE?
+
+    def get_content(self, content):
+        """mutate list of MP results"""
+        if not content: #should persist through every instantiation of QueryObject
+            content += self.rester.query(*query)
+        return content
+
+    def get_structure(self, mpid):
+        return self.rester.get_structure_by_material_id(mpid,
+                                                        final=False,
+                                                        conventional_unit_cell=False)
+
+class QuerySuite():
+    """widgets for making and reviewing queries"""
+    def __init__(self, QueryObj):
+        q = QueryObj
+        self.menu = qgrid.show_grid(q.frame)
+        
+        self.plotbutton = widgets.Button(
+            description='plot',
+            disabled=False,
+            button_style='', # 'success', 'info', 'warning', 'danger' or ''
+            tooltip='plot'
+        )
+        def click_to_plot_structure(b):
+            selected_row = self.menu.get_changed_df().index[self.menu.get_selected_rows()][0]
+            mpid_selected = q.frame.at[selected_row,'task_id']
+            print(mpid_selected)
+            struct = 
+            self.mpid_plot(struct)
+
+        self.plotbutton.on_click(click_to_plot_structure)
+    
+    def get_qgrid(self):
+        return self.menu
+
+    def _display_qgrid(self):
+        """debugging qgrid"""
+        display(self.menu)
+
+    def get_plot(self):
+        return self.plotbutton
+
     @staticmethod
-    def mpid_plot(mpid):
+    def mpid_plot(struct):
         # import POSCAR file
-    
-        struct = rester.get_structure_by_material_id(mpid, final = False, conventional_unit_cell=True)
         POSCAR_str = struct.to(fmt = "poscar")
-    
         lines = POSCAR_str.split('\n')
-    
         # get the lattice information
-    
         lattice = lines[1]
         cell_vectors = np.array([lines[2].split() , lines[3].split() , lines[4].split()]).astype(float)
-    
         # get the list of sites
-    
         sites = []
         for line in lines[8:]:
             if not line:
                 break
             sites.append([line.split()[0],line.split()[1],line.split()[2]])
-    
         # convert from fractional to xyz
-    
         sites = np.array(sites).astype(float)
         xyz = np.matmul(sites,cell_vectors).transpose()
-    
         # get the coordinates of the box
-    
-        corners = np.array([[0,1,1,0,0,0,0,1,1,0,0,1,1,1,1,0,0],[0,0,1,1,0,0,0,0,1,1,0,0,0,1,1,1,1],[0,0,0,0,0,1,1,1,1,1,1,1,0,0,1,1,0]]).T
+        corners = np.array([[0,1,1,0,0,0,0,1,1,0,0,1,1,1,1,0,0],
+                            [0,0,1,1,0,0,0,0,1,1,0,0,0,1,1,1,1],
+                            [0,0,0,0,0,1,1,1,1,1,1,1,0,0,1,1,0]]).T
         cell = np.matmul(corners,cell_vectors).transpose()
-        
         box = pd.DataFrame({'x':cell[0],'y':cell[1],'z':cell[2]})
-    
         # get a color dictionary
-    
         elements = lines[5].split()
         atoms = lines[6].split()
         hues = ['tab:blue','tab:orange','tab:green','tab:red']
         colors = []
         for i, atom in enumerate(atoms):
             colors.extend([elements[i]]*int(atoms[i]))
-    
         zip_iterator = zip(elements,hues)
         color_dict = dict(zip_iterator)
-        
         size = 72
         POSCAR_df = pd.DataFrame({'x':xyz[0],'y':xyz[1],'z':xyz[2],'element':colors,'size':size})    
         fig = px.scatter_3d(POSCAR_df, x='x', y='y', z='z',
                   color='element',labels={'x':'','y':'','z':''},size='size',size_max=size)
-        
         box = px.line_3d(box,x='x', y='y', z='z')
         fig.add_traces(list(box.select_traces()))
-        
         fig.update_layout(scene = dict(
                         xaxis = dict(
                             nticks=0,showbackground=False,showticklabels=False,),
@@ -116,10 +175,7 @@ class QuerySuite:
                         width=700,
                         margin=dict(r=10, l=10, b=10, t=10)
                       )
-    
         fig.show()
-
-    
 
 class InputSuite():
     def __init__(self, inputs, struct_dict): #users_pp_file_list
@@ -168,11 +224,6 @@ class InputSuite():
             tooltip='run to submit qe simtool'
         )
         self.button.on_click(self._on_button_clicked)
-        self.storage = widgets.Select(
-            options=["none", "nowf", "low", "medium"],
-            value="none",
-            description='wfn + dat files to save:',
-        )
         self.ecutwfc = widgets.BoundedFloatText(
             value=50,
             min=50,
@@ -211,7 +262,7 @@ class InputSuite():
         self.output = widgets.Output()
         def _on_button_clicked(self, change):
             with output:
-                print("submitting sim2l run with formula" , self.compound.value, self.spacegroup.value)
+                print("submitting sim2l run with formula" , self.compound.value)
                 runSim2l()
                 r = Run(simToolLocation,inputs)
 

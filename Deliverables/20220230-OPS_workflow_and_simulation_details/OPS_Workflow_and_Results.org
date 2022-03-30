@@ -16,7 +16,7 @@
 #+creator: Emacs 27.2 (Org mode 9.5)
 #+startup: beamer
 #+LaTeX_CLASS: beamer
-#+LaTeX_CLASS_OPTIONS: [8pt, compress]
+#+LaTeX_CLASS_OPTIONS: [10pt, compress]
 #+BEAMER_FRAME_LEVELS: 2
 #+COLUMNS: %40ITEM %10BEAMER_env(Env) %9BEAMER_envargs(Env Args) %4BEAMER_col(Col) %10BEAMER_extra(Extra)
 #+latex_header: \institute[Mannodi Group and Strachan Group]{Purdue Materials Science and Engineering\\
@@ -26,166 +26,62 @@
 #+latex_header: }
 #+latex_header: \mode<beamer>{\usetheme{Warsaw}}
 #+latex_header: \useoutertheme{miniframes}
-* Input/Output
-** Inputs                                                          :B_frame:
-:PROPERTIES:
-:BEAMER_env: frame
-:END:
-*** Structure Selection                                     :B_block:BMCOL:
-:PROPERTIES:
-:BEAMER_env: block
-:BEAMER_col: 0.3
-:END:
-1. mpID, POSCARS, ciffs, etc. made into pymatgen structure
-2. pmg struct is encoded as dictionary and sent to tool
-3. Dictionaries can be easily checked for identity
-*** Input Declaration                                       :B_block:BMCOL:
-:PROPERTIES:
-:ID:       a7390de0-589f-4ee7-9659-ca61d1262886
-:BEAMER_env: block
-:BEAMER_col: 0.7
-:END:
-#+begin_export latex
-\tiny
-#+end_export
-#+begin_example
-{'@module': 'pymatgen.core.structure',
- '@class': 'Structure',
- 'charge': None,
- 'lattice': {'matrix': [[1.5920500003918698, -2.7575114888687695, 0.0],
-   [1.5920500003918698, 2.7575114888687695, 0.0],
-   [0.0, 0.0, 5.1551]],
-  'a': 3.1841000007837397,
-  'b': 3.1841000007837397,
-  'c': 5.1551,
-  'alpha': 90.0,
-  'beta': 90.0,
-  'gamma': 120.00000000000001,
-  'volume': 45.26276950032406},
- 'sites': [{'species': [{'element': 'Zn', 'occu': 1}],
-   'abc': [0.6666666666666666, 0.3333333333333333, 0.5],
-   'xyz': [1.5920500003918696, -0.9191704962895898, 2.57755],
-   'label': 'Zn',
-   'properties': {}},
-  {'species': [{'element': 'Zn', 'occu': 1}],
-   'abc': [0.3333333333333333, 0.6666666666666666, 0.0],
-   'xyz': [1.5920500003918696, 0.9191704962895898, 0.0],
-   'label': 'Zn',
-   'properties': {}},
-  {'species': [{'element': 'O', 'occu': 1}],
-   'abc': [0.6666666666666666, 0.3333333333333333, 0.8803099999999999],
-   'xyz': [1.5920500003918696, -0.9191704962895898, 4.538086080999999],
-   'label': 'O',
-   'properties': {}},
-  {'species': [{'element': 'O', 'occu': 1}],
-   'abc': [0.3333333333333333, 0.6666666666666666, 0.3803099999999999],
-   'xyz': [1.5920500003918696, 0.9191704962895898, 1.9605360809999997],
-   'label': 'O',
-   'properties': {}}]}
-#+end_example
-** Outputs                                                         :B_frame:
-:PROPERTIES:
-:BEAMER_env: frame
-:BEAMER_opt: allowframebreaks
-:END:
-*** structures/chemistries returned for future query              :B_block:
-:PROPERTIES:
-:BEAMER_env: block
-:END:
-Outputs can be queried by key and filtered by conditional matching on values
-- Formula
-- mpID
-- spacegroup
-*** Electronic properties returned for analysis                   :B_block:
-:PROPERTIES:
-:BEAMER_env: block
-:END:
-- [ ] scalers
-  - [ ] bandgap
-  - [ ] fermi energy
-  - [ ] charge densities
-  - [ ] raman/IR cutoff
-  - [ ] UV cutoff
-- [-] spectra
-  - [X] raman/IR
-  - [ ] eDoS
-  - [ ] phonon dispersion
-  - [ ] SLME (these might be relegated to post processing)
-  - [ ] PV FOM
-*** COMMENT Mechanical properties returned for analysis                   :B_block:
-:PROPERTIES:
-:BEAMER_env: block
-:END:
-Note: these returns are probably conditional on the pipeline...
-- [ ] tensors -- enabling analysis of optical response to strain effect
-  - [ ] forces
-  - [ ] stress
-*** Fallbacks                                                     :B_block:
-:PROPERTIES:
-:BEAMER_env: block
-:END:
+* Input
+** Declarations
+*** Strucutre Processing
+***
+* Output
+** Declarations and
 
 * Results
-** Kat's Troubleshooting                                           :B_frame:
-:PROPERTIES:
-:BEAMER_env: frame
-:BEAMER_opt: allowframebreaks
-:END:
-Detailed breakdown of simulation shortcomings
-- Testing workflow for ZnO (mpid = 2133)
-- outputs are *extremely* sensitive to input choices
-- trying other structures would be useful as well
-*** ecutwfc = 50 Ry, 1 node                                       :B_block:
-:PROPERTIES:
-:BEAMER_env: block
-:END:
-| KPOINTS | output                 |
-|---------+------------------------|
-|       3 | Y                      |
-|       6 | N (smearing is needed) |
-|       9 | N (walltime reached)   |
-|      12 | N (walltime reached)   |
-|      15 | N (walltime reached)   |
-*** TODO ecutwfc = 50 Ry, 4 nodes                                 :B_block:
-:PROPERTIES:
-:BEAMER_env: block
-:END:
-| KPOINTS | output |
-|---------+--------|
-|       3 | Y      |
-|       6 |        |
-|       9 |        |
-|      12 |        |
-|      15 |        |
-*** ecutwfc = 60 Ry, 4 nodes                                      :B_block:
-:PROPERTIES:
-:BEAMER_env: block
-:END:
-Is this too high? ~800 eV, but 'recommended'...
-| KPOINTS | output             |
-|---------+--------------------|
-|       3 | N (vc-relax fails) |
-|       6 | N (vc-relax fails) |
-|       9 | N (vc-relax fails) |
-*** ecutwfc = 40 Ry, 4 nodes                                      :B_block:
-:PROPERTIES:
-:BEAMER_env: block
-:END:
-| KPOINTS | output             |
-|---------+--------------------|
-|       3 | Y                  |
-|       6 | N (vc-relax fails) |
-|       9 | N (vc-relax fails) |
-* Logistics
-** Runs Storage                                                    :B_frame:
-:PROPERTIES:
-:BEAMER_env: frame
-:END:
-
-dft related issues presentation.
-
-- Currently very limited by storage space in nanoHUB
-- Each (successful) simulation takes up 1-2 GB in storage?
-- it may be desirable to reimplement the simtool via a pegasus workflow
-  - enabling improved job parallelization?
-  - enabling more detailed data management?
+** Kat
+I'm not going to dig too much into beamer / org-mode formatting, so I'm just adding my contributions here since I can't preview at the moment
+- for ZnO (mpid = 2133), outputs are EXTREMELY sensitive to input choices
+- "vc-relax fails" = failed to converge
+  - ecutwfc = 40 Ry, 4 nodes
+  | KPOINTS |       output         |
+  |---------+----------------------|
+  |    3    |          Y           |
+  |    6    |  N (vc-relax fails)  |
+  |    9    |  N (vc-relax fails)  |
+  - ecutwfc = 40 Ry, 8 nodes
+  | KPOINTS |       output         |
+  |---------+----------------------|
+  |    3    |          Y           |
+  |    6    |  N (vc-relax fails)  |
+  |    9    |  N (vc-relax fails)  |
+  - ecutwfc = 50 Ry, 1 node6
+  | KPOINTS |       output         |
+  |---------+----------------------|
+  |    3    |         Y            |
+  |    6    |N (smearing is needed)|
+  |    9    | N (walltime reached) |
+  |    12   | N (walltime reached) |
+  |    15   | N (walltime reached) |
+  - ecutwfc = 50 Ry, 4 nodes
+  | KPOINTS |       output         |
+  |---------+----------------------|
+  |    3    |          Y           |
+  |    6    |  N (vc-relax fails)  |
+  |    9    |          Y           |
+  |    12   | N (walltime reached) |
+  |    15   | N (walltime reached) |
+  - ecutwfc = 60 Ry, 4 nodes
+  | KPOINTS |       output         |
+  |---------+----------------------|
+  |    3    |  N (vc-relax fails)  |
+  |    6    |  N (vc-relax fails)  |
+  |    9    |  N (vc-relax fails)  |
+- for SiC (mpid = 1002206)
+  - ecutwfc = 40 Ry, 4 nodes
+  | KPOINTS |       output         |
+  |---------+----------------------|
+  |    3    |          Y           |
+  |    6    |  N (vc-relax fails)  |
+  |    9    |  N (vc-relax fails)  |
+- each (successful) simulation takes up 1-2 GB in storage?
+- why are they failing to converge?
+  - vcrelax final scf calculation fails to converge, even after 1000 electronic steps
+    - only one ionic step
+  - "The maximum number of steps has been reached."
+  - cell shape changes drastically (due to no symmetry?)

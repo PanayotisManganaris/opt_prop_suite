@@ -16,10 +16,10 @@ def makePlot():
         lines = output.readlines()
         E = []
         for line in lines:
-            if 'total energy' in line:
+            if '!' in line:
                 data = line.split()
-                if isadigit(data[3]):
-                    E.append(data[3])
+                # if isadigit(data[3]):
+                E.append(data[4])
 
         output.close()
 
@@ -32,7 +32,7 @@ def makePlot():
 
     plt.figure()
     plt.plot(s,E)
-    plt.xlabel("electronic step")
+    plt.xlabel("ionic step")
     plt.ylabel("energy (Ry)")
     plt.title("Energy Convergence")
     plt.savefig("E.png")

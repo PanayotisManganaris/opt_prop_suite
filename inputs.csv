@@ -1,0 +1,10 @@
+,dir,ecutwfc,kpoints,pp1,pp2
+0,d86618afa5fe42cd84d57301d3e3fbfd,40,6,Si.pbe.upf,fixed
+1,7d04455faa88463ebf04b8a8fd1397ee,40,6,Si.pbe.upf,C.pbe.upf
+2,c100da60397943e09970671c379cb575,40,6,Si.pbe.upf,C.pbe.upf
+3,92e482e5d63448119321c121906972c1,40,6,Si.pbe.upf,fixed
+4,0a030a0e8e994f1a949f8b2e98f72446,40,6,Si.pbe.upf,fixed
+5,f041119c03f3423ebcc48e084439ade0,40,6,Si.pbe.upf,fixed
+6,5b4b7dc36052418b93350504aed11eb1,40,6,Zn.pbe.upf,S.pbe.upf
+7,bed08045eb73458389f722bd41e8770c,40,6,Zn.pbe.upf,S.pbe.upf
+8,edcab2be23a748a1bfdb0c5fb5bbced8,40,6,Si.pbe.upf,fixed

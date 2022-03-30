@@ -12,3 +12,7 @@
 </script>
 
 almost works as intended... for some reason the Appmode screen is 404 not found
+
+also try working with
+
+location.replace(window.location.href.replace("notebooks", "apps"));

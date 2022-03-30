@@ -3,6 +3,10 @@ import numpy as np
 import os
 import glob
 import pandas as pd
+import re
+
+def isadigit(string):
+    return bool(re.match(r'[-+]?(?:\d+(?:\.\d*)?|\.\d+)', string))
 
 def makePlot():
     filepath = "*.vc-relax.out"
@@ -12,20 +16,24 @@ def makePlot():
         lines = output.readlines()
         E = []
         for line in lines:
-            if '!' in line:
+            if 'total energy' in line:
                 data = line.split()
-                E.append(data[4])
+                if isadigit(data[3]):
+                    E.append(data[3])
 
         output.close()
 
+    # print(E)
     E = [float(e) for e in E]
-    print(E)
+    # pd.series(E)
+    # print(E)
+    # E = [e for e in E if e.isnumeric()]
     s = np.linspace(1, len(E), len(E))
 
     plt.figure()
     plt.plot(s,E)
-    plt.xlabel("ionic step")
-    plt.ylabel("energy (eV)")
+    plt.xlabel("electronic step")
+    plt.ylabel("energy (Ry)")
     plt.title("Energy Convergence")
     plt.savefig("E.png")
     plt.close()

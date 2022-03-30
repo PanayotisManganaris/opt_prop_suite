@@ -1,0 +1,14 @@
+%%html
+<script>
+    // AUTORUN APPMODE ON NOTEBOOK-LOAD!
+    require(
+        ['base/js/namespace', 'jquery'], 
+        function(jupyter, $) {
+            $(jupyter.events).on("kernel_ready.Kernel", function () {
+                $("#toggle_codecells").click()
+            });
+        }
+    );
+</script>
+
+almost works as intended... for some reason the Appmode screen is 404 not found

@@ -42,22 +42,49 @@ def addInputs(filename, df):
 
     inputs = open("inputs.yaml","r")
     lines = inputs.readlines()
-    for i, line in enumerate(lines):
+    ecutwfc = 0
+    ecutrho = 0
+    kpoints = 0
+    elements = []
+    pps = []
+    for line in lines:
         if 'ecutwfc' in line:
             ecutwfc = line.split()[1]
+        elif 'ecutrho' in line:
+            ecutrho = line.split()[1]
         elif 'kpoints' in line:
             kpoints = line.split()[1]
-        elif 'pp' in line:
-            pp1 = lines[i+1].split()[1]
-            pp2 = lines[i+2].split()[1]
-    print(filename,ecutwfc,kpoints,pp1,pp2)
-    df.loc[len(df.index)] = [filename,ecutwfc,kpoints,pp1,pp2]
-    print("added inputs")
+        elif 'element' in line:
+            elements.append(line.split()[2])
+        elif '.upf' in line:
+            pps.append(line.split()[1])
     inputs.close()
+
+    log = open('run.log','r')
+    lines = log.readlines()
+    vcr = False
+    scf = False
+    ph = False
+    dm = False
+    date = lines[0].split()[1]
+    time = lines[0].split()[2]
+    for line in lines:
+        if 'reached cell relaxation' in line:
+            vcr = True
+        elif 'reached self consistent field calculation' in line:
+            scf = True
+        elif 'reached phonon calculation' in line:
+            ph = True
+        elif 'reached dynamical matrix calculation' in line:
+            dm = True
+        log.close()
+
+    df.loc[len(df.index)] = [filename, elements, ecutwfc, ecutrho, kpoints, pps, date, time, vcr, scf, ph, dm]
+    print(f"added inputs successfully for {filename}")
 
     return df
 
-outputs = ['dir','ecutwfc','kpoints','pp1','pp2']
+outputs = ['filename', 'elements', 'ecutwfc', 'ecutrho', 'kpoints', 'pps', 'date', 'time', 'vcr', 'scf', 'ph', 'dm']
 
 df = pd.DataFrame(columns=outputs)
 

@@ -1,13 +1,23 @@
-,dir,ecutwfc,kpoints,pp1,pp2
-0,d86618afa5fe42cd84d57301d3e3fbfd,40,6,Si.pbe.upf,fixed
-1,7d04455faa88463ebf04b8a8fd1397ee,40,6,Si.pbe.upf,C.pbe.upf
-2,c100da60397943e09970671c379cb575,40,6,Si.pbe.upf,C.pbe.upf
-3,92e482e5d63448119321c121906972c1,40,6,Si.pbe.upf,fixed
-4,0a030a0e8e994f1a949f8b2e98f72446,40,6,Si.pbe.upf,fixed
-5,f041119c03f3423ebcc48e084439ade0,40,6,Si.pbe.upf,fixed
-6,5b4b7dc36052418b93350504aed11eb1,40,6,Zn.pbe.upf,S.pbe.upf
-7,bed08045eb73458389f722bd41e8770c,40,6,Zn.pbe.upf,S.pbe.upf
-8,edcab2be23a748a1bfdb0c5fb5bbced8,40,6,Si.pbe.upf,fixed
-9,6ff1fb5200c14cfc89a36aec99fcdc62,40,6,Si.pbe.upf,fixed
-10,8b4b3a3b71044e9c9ec906440b4db658,40,6,Si.pbe.upf,fixed
-11,b5266582028a424ca2e464a84911174d,40,6,Zn.pbe.upf,S.pbe.upf
+,filename,elements,ecutwfc,ecutrho,kpoints,pps,date,time,vcr,scf,ph,dm
+0,d86618afa5fe42cd84d57301d3e3fbfd,"['Si', 'Si', 'Si', 'Si', 'Si', 'Si', 'Si', 'Si']",40,160,6,['Si.pbe.upf'],2022-03-28,12:48:54,True,True,True,False
+1,7d04455faa88463ebf04b8a8fd1397ee,"['Si', 'Si', 'Si', 'Si', 'C', 'C', 'C', 'C']",40,160,6,"['Si.pbe.upf', 'C.pbe.upf']",2022-03-28,14:09:54,True,True,False,False
+2,c100da60397943e09970671c379cb575,"['Si', 'Si', 'Si', 'Si', 'C', 'C', 'C', 'C']",40,160,6,"['Si.pbe.upf', 'C.pbe.upf']",2022-03-28,14:17:26,True,True,True,True
+3,92e482e5d63448119321c121906972c1,"['Si', 'Si', 'Si', 'Si', 'Si', 'Si', 'Si', 'Si']",40,160,6,['Si.pbe.upf'],2022-03-28,15:13:27,True,True,True,True
+4,0a030a0e8e994f1a949f8b2e98f72446,"['Si', 'Si']",40,160,6,['Si.pbe.upf'],2022-03-28,16:37:05,True,False,False,False
+5,f041119c03f3423ebcc48e084439ade0,"['Si', 'Si']",40,160,6,['Si.pbe.upf'],2022-03-28,16:39:19,True,True,True,True
+6,5b4b7dc36052418b93350504aed11eb1,"['S', 'Zn']",40,160,6,"['Zn.pbe.upf', 'S.pbe.upf']",2022-03-30,05:20:24,True,True,True,True
+7,bed08045eb73458389f722bd41e8770c,"['Zn', 'Zn', 'Zn', 'Zn', 'S', 'S', 'S', 'S']",40,160,6,"['Zn.pbe.upf', 'S.pbe.upf']",2022-03-30,06:12:56,True,True,True,True
+8,edcab2be23a748a1bfdb0c5fb5bbced8,"['Si', 'Si', 'Si', 'Si', 'Si', 'Si', 'Si', 'Si']",40,160,6,['Si.pbe.upf'],2022-03-30,08:15:05,True,True,True,True
+9,6ff1fb5200c14cfc89a36aec99fcdc62,"['Si', 'Si', 'Si', 'Si', 'Si', 'Si', 'Si', 'Si']",40,160,6,['Si.pbe.upf'],2022-03-30,09:31:12,True,True,True,False
+10,8b4b3a3b71044e9c9ec906440b4db658,"['Si', 'Si', 'Si', 'Si', 'Si', 'Si', 'Si', 'Si']",40,160,6,['Si.pbe.upf'],2022-03-30,10:00:02,True,True,True,False
+11,b5266582028a424ca2e464a84911174d,"['S', 'Zn']",40,160,6,"['Zn.pbe.upf', 'S.pbe.upf']",2022-03-30,10:50:38,True,True,True,False
+12,85dd5bb562ea4164b74b65027a0f0fc0,"['S', 'Zn']",40,160,6,"['Zn.pbe.upf', 'S.pbe.upf']",2022-03-30,11:51:42,True,True,False,False
+13,bb184ba144f444e18ebe482d583e8f75,"['S', 'Zn']",40,160,6,[],2022-03-30,12:03:53,True,False,False,False
+14,12f1635e1a7e4760a74d8647fd060ff9,"['S', 'Zn']",40,160,6,[],2022-03-30,12:06:31,True,False,False,False
+15,bf634fba260b4fb3be560ee6d55450f3,"['S', 'Zn']",40,160,6,[],2022-03-30,13:00:00,True,False,False,False
+16,660758c1efaf4ca5b24b6426e58b0606,"['S', 'Zn']",40,160,6,"['Zn.pbe.upf', 'S.pbe.upf']",2022-03-30,13:02:05,True,True,False,False
+17,d5a2d4070315454ebce095f31e64e193,"['S', 'Zn']",200,800,6,"['Zn.pbe.upf', 'S.pbe.upf']",2022-03-30,13:13:10,True,True,True,True
+18,c3b7f0b25df2488bad9369dbb8e35e4f,"['S', 'Zn']",50,200,6,"['Zn.pbe.upf', 'S.pbe.upf']",2022-03-30,15:25:49,True,True,True,True
+19,7083c96e51814de5a61c325c3fee27e5,"['S', 'Zn']",100,400,6,"['Zn.pbe.upf', 'S.pbe.upf']",2022-03-30,16:12:16,True,True,True,True
+20,20a3421be2b943809301bc8c61620678,"['S', 'Zn']",150,600,6,"['Zn.pbe.upf', 'S.pbe.upf']",2022-03-30,17:37:09,True,True,True,True
+21,55a8e5ada00e415ea750b9ed80aed858,"['S', 'Zn']",200,800,6,"['Zn.pbe.upf', 'S.pbe.upf']",2022-03-30,19:19:50,True,True,True,True

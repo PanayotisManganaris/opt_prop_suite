@@ -6,3 +6,5 @@ simtool/qe6.8/
 RUNS/
 .submit.log
 .ftpconfig
+output_viewer.py
+*.pptx

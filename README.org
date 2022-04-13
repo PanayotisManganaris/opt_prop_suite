@@ -115,8 +115,7 @@ simtool auto-generates databases?
 - [X] hide code blocks
 ** Panos
 *** Standardize Development Environment
-qgrid apparently is a big hassle to install on nanohub? user databrowser gui based on it
-
+No dice
 *** Obtain Results
 500-700 sample structures chosen by Shivam
 get cutoff frequency at the maximum of final peak (see optprop for optimizer)
@@ -184,4 +183,12 @@ dft related issues presentation.
 * User Instructions
 ** optical property calculation
 ** assessing results
+*** calculation verification
+the post processing notebook can offer a history of experiments from materials project results
+to check that the simulation results compares to known 
+*** validation
+validation is left to the user
 ** data management
+:PROPERTIES:
+:ID:       add3b2f8-5db6-4a3e-8174-120564950468
+:END:

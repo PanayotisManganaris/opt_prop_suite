@@ -33,7 +33,7 @@ class Authenticate():
 
     def mpkey(self):
         """
-        ask user for authentication if they are not already authorized
+        ask user for authentication if they do not already have mpkey file
         """
         if self.checkmp:
             pass
@@ -88,7 +88,7 @@ class MPQuery():
     def get_content(self, content):
         """mutate list of MP results"""
         if not content: #should persist through every instantiation of QueryObject
-            content += self.rester.query(*query)
+            content += self.rester.query(*self.query)
         return content
 
     def get_structure(self, mpid):
@@ -111,8 +111,7 @@ class QuerySuite():
         def click_to_plot_structure(b):
             selected_row = self.menu.get_changed_df().index[self.menu.get_selected_rows()][0]
             mpid_selected = q.frame.at[selected_row,'task_id']
-            print(mpid_selected)
-            struct = 
+            struct = q.get_structure(mpid_selected)
             self.mpid_plot(struct)
 
         self.plotbutton.on_click(click_to_plot_structure)
@@ -120,12 +119,13 @@ class QuerySuite():
     def get_qgrid(self):
         return self.menu
 
+    def get_plot(self):
+        return self.plotbutton
+
     def _display_qgrid(self):
         """debugging qgrid"""
         display(self.menu)
 
-    def get_plot(self):
-        return self.plotbutton
 
     @staticmethod
     def mpid_plot(struct):

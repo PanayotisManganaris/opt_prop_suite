@@ -117,7 +117,7 @@ class MPQuery():
                                                         conventional_unit_cell=False)
 
 class FakeQuery():
-    """ A Materials Project Debugging Query Object """
+    """ A minimal Query Object serving both default and debugging purposes """
     def __init__(self, content=[], Debug=False, **kwargs):
         self.frame = pd.DataFrame(["You must authenticate into a remote data source and run a query to use this interface."],
                                   index=["alert!"], columns=["attention!"])
@@ -129,10 +129,17 @@ class FakeQuery():
         raise NotImplementedError("No rest api needed to see this output!")
 
 class QueryPanel():
-    """pick from a selection of pre-established queries"""
+    """
+    widget class
+    1. interactively instantiate and swap between query objects using the Toggles widget
+    2. Collect and display query status with the progressout widget
+    wishlist: customize query scope using a panel of interactive sliders
+    feed the result to the respective query objects.
+    probably a post-OPTIMATE thing
+    """
     def __init__(self):
         self.progressout = widgets.Output(layout={'border': "5px solid black"})
-        self.Toggles = widgets.ToggleButtons(
+        self.toggles = widgets.ToggleButtons(
             options=["None",
                      "Debug", #comment for release
                      "Materials Project"],
@@ -143,16 +150,16 @@ class QueryPanel():
                       "Contact the Materials Project REST API for semiconductor information"]
         )
         self.Q = FakeQuery() #default
-        self.Toggles.observe(self._assign_data_on_pick)
+        self.toggles.observe(self._assign_data_on_pick)
 
     def _assign_data_on_pick(self, change):
         """ observes update to the traitlets bunch, doesn't use it... too much throughput"""
         with self.progressout:
-            if self.Toggles.value == "None":
+            if self.toggles.value == "None":
                 self.Q = FakeQuery()
-            elif self.Toggles.value == "Materials Project":
+            elif self.toggles.value == "Materials Project":
                 self.Q = MPQuery()
-            elif self.Toggles.value == "Debug":
+            elif self.toggles.value == "Debug":
                 self.Q = FakeQuery(Debug=True)
 
 class StructureSuite():
@@ -161,16 +168,14 @@ class StructureSuite():
         self.Q = QueryObj
         #inspection widgets
         self.plotout = widgets.Output(layout={'border': '5px solid black'})
-        self.plotbutton = widgets.Button(
-            description='plot',
-            disabled=False,
-            button_style='', # 'success', 'info', 'warning', 'danger' or ''
-            tooltip='plot'
-        )
         #remote interface widget
         self.menu = qgrid.show_grid(self.Q.frame) #make grid widget with convenience method
         self.menu.observe(self._process_pick_row)
         #local interface widgets
+
+        # configure so the uploaded file is written to the copybox for review?
+        # almost certainly will inconvenience any attempts to chain structures for sequential simulation...
+
         # self.upload_button = FileUpload(name="Upload Structure",
         #                                 desc="POSCAR, cif, etc..",
         #                                 dir="./",
@@ -180,32 +185,32 @@ class StructureSuite():
         #     pass
 
         self.copybox = widgets.Textarea(value="",
-                                        placeholder="Structure: ",
-                                        description="Write Structure",
-                                        disabled=False)
+                                        placeholder="formula\nscale\nx y z\na b c\netc... ",
+                                        description="Structure: ",
+                                        disabled=False,
+                                        layout=widgets.Layout(height="300px", width="auto"))
 
-        clickact = partial(self._process_input_on_button_click, out=self.plotout,
-                           Q=self.Q, watch_widget=self.copybox)
+        self.plotbutton = widgets.Button(
+            description='Plot',
+            disabled=False,
+            button_style='info',
+            tooltip='Generates Structure and Plots'
+        )
+        self.plotbutton.on_click(self._process_input)
 
-        self.plotbutton.on_click(clickact)
+    def _induce_format(self, raw_string:str):
+        """ pymatgen contains no logic for this, so here is a simple stuffer """
+        self.struct = Structure.from_str(raw_string,
+                                         primitive=False, #only for cifs
+                                         sort=False,
+                                         fmt="poscar") #currently hardcoded
 
-
-    def _convert_to_file_object(self, raw_string:str):
-        sio = io.StringIO()
-        with sio as fileobj:
-            fileobj.write(raw)
-            fileobj.seek(0)
-        self.struct = Structure.from_file(fileobj,
-                                          primitive=False, #only for cifs
-                                          sort=False,)
-
-
-    def _process_input_on_button_click(self, event, out, Q, watch_widget):
+    def _process_input(self, event):
         """ raw callback for generic id widget """
-        with out:
+        with self.plotout:
             clear_output(wait=True)
-            raw_string=watch_widget.value
-            self._convert_to_file_object()
+            self._induce_format(self.copybox.value)
+            self.struct_plot(self.struct)
 
     def _process_pick_row(self, event):
         """ raw callback for qgrid menu """

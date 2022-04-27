@@ -131,6 +131,7 @@ class FakeQuery():
 class QueryPanel():
     """pick from a selection of pre-established queries"""
     def __init__(self):
+        self.progressout = widgets.Output(layout={'border': "5px solid black"})
         self.Toggles = widgets.ToggleButtons(
             options=["None",
                      "Debug", #comment for release
@@ -146,39 +147,29 @@ class QueryPanel():
 
     def _assign_data_on_pick(self, change):
         """ observes update to the traitlets bunch, doesn't use it... too much throughput"""
-        if self.Toggles.value == "None":
-            self.Q = FakeQuery()
-        elif self.Toggles.value == "Materials Project":
-            self.Q = MPQuery()
-        elif self.Toggles.value == "Debug":
-            self.Q = FakeQuery(Debug=True)
+        with self.progressout:
+            if self.Toggles.value == "None":
+                self.Q = FakeQuery()
+            elif self.Toggles.value == "Materials Project":
+                self.Q = MPQuery()
+            elif self.Toggles.value == "Debug":
+                self.Q = FakeQuery(Debug=True)
 
 class StructureSuite():
     """create and return widgets for making and reviewing queries -- display arrangement handled externally"""
     def __init__(self, QueryObj):
         self.Q = QueryObj
-        #remote interface widgets
+        #inspection widgets
         self.plotout = widgets.Output(layout={'border': '5px solid black'})
-        self.menu = qgrid.show_grid(self.Q.frame) #make grid widget with convenience method
-        self.searchbox = widgets.IntText(
-            value=2133,
-            description='ID:',
-            disabled=False
-        )
         self.plotbutton = widgets.Button(
             description='plot',
             disabled=False,
             button_style='', # 'success', 'info', 'warning', 'danger' or ''
             tooltip='plot'
         )
-        
-        clickact = partial(self._plot_on_button_click, out=self.plotout,
-                           Q=self.Q, watch_widget=self.searchbox)
-        pickact = partial(self._plot_on_pick_row, out=self.plotout,
-                          Q=self.Q, grid=self.menu)
-
-        self.plotbutton.on_click(clickact)
-        self.menu.observe(pickact)
+        #remote interface widget
+        self.menu = qgrid.show_grid(self.Q.frame) #make grid widget with convenience method
+        self.menu.observe(self._process_pick_row)
         #local interface widgets
         # self.upload_button = FileUpload(name="Upload Structure",
         #                                 desc="POSCAR, cif, etc..",
@@ -188,37 +179,42 @@ class StructureSuite():
         # def _read_into_copybox(copybox, filename):
         #     pass
 
-        # self.copybox = widgets.Textarea(value="",
-        #                                 placeholder="Structure Text",
-        #                                 description="POSCAR is recognized",
-        #                                 disabled=False)
+        self.copybox = widgets.Textarea(value="",
+                                        placeholder="Structure: ",
+                                        description="Write Structure",
+                                        disabled=False)
 
-    def _assign_struct_and_plot(self, raw:str):
-        if len(raw.splitlines()) == 1:
-            #structure by ID
-            self.struct = self.Q.get_structure(raw)
-        else:
-            with io.StringIO() as fileobj:
-                fileobj.write(raw)
-                fileobj.seek(0)
-            self.struct = Structure.from_file(fileobj,
-                                              primitive=False, #only for cifs
-                                              sort=False,)
-        self.struct_plot(self.struct)
+        clickact = partial(self._process_input_on_button_click, out=self.plotout,
+                           Q=self.Q, watch_widget=self.copybox)
 
-    def _plot_on_button_click(self, event, out, Q, watch_widget):
+        self.plotbutton.on_click(clickact)
+
+
+    def _convert_to_file_object(self, raw_string:str):
+        sio = io.StringIO()
+        with sio as fileobj:
+            fileobj.write(raw)
+            fileobj.seek(0)
+        self.struct = Structure.from_file(fileobj,
+                                          primitive=False, #only for cifs
+                                          sort=False,)
+
+
+    def _process_input_on_button_click(self, event, out, Q, watch_widget):
         """ raw callback for generic id widget """
         with out:
             clear_output(wait=True)
-            mpid="mp-"+str(watch_widget.value)
-            self._assign_struct_and_plot(mpid)
+            raw_string=watch_widget.value
+            self._convert_to_file_object()
 
-    def _plot_on_pick_row(self, event, out, Q, grid):
+    def _process_pick_row(self, event):
         """ raw callback for qgrid menu """
-        with out:
+        grid = self.menu
+        with self.plotout:
             clear_output(wait=True)
-            mpid = grid.get_changed_df().at[grid.get_selected_rows()[0],'task_id']
-            self._assign_struct_and_plot(mpid)
+            sid = grid.get_changed_df().at[grid.get_selected_rows()[0],'task_id'] #hardcoded for mp. id key should depend on Q
+            self.struct = self.Q.get_structure(sid)
+            self.struct_plot(self.struct)
             
     @staticmethod
     def struct_plot(struct):

@@ -4,16 +4,19 @@ import pandas as pd
 import numpy as np
 import qgrid
 from pymatgen.ext.matproj import MPRester
+from pymatgen.core import Structure
 
 #simtool loading and interface
 from simtool import findInstalledSimToolNotebooks,searchForSimTool
 from simtool import getSimToolInputs,getSimToolOutputs,Run
 
 #user interface utilities 
-import os, stat
+import os, stat, io
 import plotly.express as px
 import ipywidgets as widgets
 from IPython.display import display, Javascript, clear_output
+from hublib.ui import FileUpload
+
 from functools import partial
 import time
 
@@ -150,10 +153,11 @@ class QueryPanel():
         elif self.Toggles.value == "Debug":
             self.Q = FakeQuery(Debug=True)
 
-class ReviewSuite():
+class StructureSuite():
     """create and return widgets for making and reviewing queries -- display arrangement handled externally"""
     def __init__(self, QueryObj):
         self.Q = QueryObj
+        #remote interface widgets
         self.plotout = widgets.Output(layout={'border': '5px solid black'})
         self.menu = qgrid.show_grid(self.Q.frame) #make grid widget with convenience method
         self.searchbox = widgets.IntText(
@@ -175,9 +179,31 @@ class ReviewSuite():
 
         self.plotbutton.on_click(clickact)
         self.menu.observe(pickact)
-        
-    def _assign_struct_and_plot(self, id):
-        self.struct = self.Q.get_structure(id)
+        #local interface widgets
+        # self.upload_button = FileUpload(name="Upload Structure",
+        #                                 desc="POSCAR, cif, etc..",
+        #                                 dir="./",
+        #                                 maxnum=1,
+        #                                 cb=_read_into_copybox)
+        # def _read_into_copybox(copybox, filename):
+        #     pass
+
+        # self.copybox = widgets.Textarea(value="",
+        #                                 placeholder="Structure Text",
+        #                                 description="POSCAR is recognized",
+        #                                 disabled=False)
+
+    def _assign_struct_and_plot(self, raw:str):
+        if len(raw.splitlines()) == 1:
+            #structure by ID
+            self.struct = self.Q.get_structure(raw)
+        else:
+            with io.StringIO() as fileobj:
+                fileobj.write(raw)
+                fileobj.seek(0)
+            self.struct = Structure.from_file(fileobj,
+                                              primitive=False, #only for cifs
+                                              sort=False,)
         self.struct_plot(self.struct)
 
     def _plot_on_button_click(self, event, out, Q, watch_widget):

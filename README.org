@@ -192,3 +192,29 @@ validation is left to the user
 :PROPERTIES:
 :ID:       add3b2f8-5db6-4a3e-8174-120564950468
 :END:
+* clean up parametrization feedback
+- calculation validation logic:
+  - log validation as output ("calculation converged")
+  - standardize log level for production deployment
+- compute resources should be conservatively estimated from electron count
+
+- update kpoint descriptions
+- and define kpoint settings in terms of input density
+- focus on crystals -- adjust epsil accordingly
+  - epsil decides dielectric constant calculations?
+  - decide and fix.
+- pp needs to be a choice
+  - then restrict the available pseudo potentials according to the viability of the XC functional
+  - select them all at once. set descriptions accordingly.
+- credit pymatgen for the struct_dict
+  - put it at the top
+- outputs
+  - quality evaluation keys
+  - total energy
+  - stress tensor
+  - atomic forces tensor
+  - spectra
+  - return dielectric constant
+  - IR cutoff
+  - "relaxed" structure
+  - chemical formula -- return a composition object

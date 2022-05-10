@@ -17,7 +17,7 @@ import ipywidgets as widgets
 from IPython.display import display, Javascript, clear_output
 
 from functools import partial
-import time
+import re
 import codecs
 
 class Authenticate():
@@ -215,6 +215,35 @@ class QueryPanel():
             elif self.toggles.value == "Debug":
                 self.Q = FakeQuery(Debug=True)
 
+class FoundFormat():
+    """
+    contains logic for determining a crystallographic file format string from the string
+    """
+    def __init__(self, string):
+        self.string = string
+
+    def is_cif():
+        return False
+
+    def is_poscar():
+        return True
+
+    def is():
+        if self.is_cif():
+            return 'cif'
+        if self.is_poscar():
+            return 'poscar'
+        if self.is_cssr():
+            return 'cssr'
+        if self.is_json():
+            return 'json'
+        if self.is_yaml():
+            return 'yaml'
+        if self.is_xsf():
+            return 'xsf'
+        if self.is_mcsqs():
+            return 'mcsqs'
+
 class InputSuite():
     """
     create and return widgets for selecting and reviewing a structure from various sources
@@ -250,16 +279,22 @@ class InputSuite():
             accept='',
             multiple=True,
         )
-        self.upload_button.value
-        self.file_menu = qgrid.show_grid()
-        self.file_menu.observe(self._process_pick_file)
+        # link a callback to the fileupload that intercepts the values and populates a df??
+        # getting content from the upload's value:
+        #input_files = ss.upload_button.value['POSCAR']['content']
+        #for input_file in input_files:
+        # print(codecs.decode(input_file, encoding="utf-8"))
+        # self.upload_button.value
+        self.file_menu = qgrid.show_grid(self.Q.frame)
+        # self.file_menu.observe(self._process_pick_file)
     
     def _induce_format(self, raw_string:str):
         """ pymatgen contains no logic for this, so here is a simple stuffer """
+        sfmt='POSCAR'
         self.struct = Structure.from_str(raw_string,
                                          primitive=False, #only for cifs
                                          sort=False,
-                                         fmt="poscar") #currently hardcoded
+                                         fmt=sfmt) #currently hardcoded
 
     def _process_input(self, event):
         """ callback for copybox """
@@ -288,8 +323,7 @@ class InputSuite():
             struct_plot(self.struct)
 
 class SimSettingSuite():
-    def __init__(self, inputs, struct_dict): #users_pp_file_list
-
+    def __init__(self): #users_pp_file_list
         installedSimToolNotebooks = findInstalledSimToolNotebooks(simToolName,returnString=True)
         print(installedSimToolNotebooks)
 

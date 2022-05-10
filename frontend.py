@@ -215,7 +215,7 @@ class QueryPanel():
             elif self.toggles.value == "Debug":
                 self.Q = FakeQuery(Debug=True)
 
-class FoundFormat():
+class ThisString():
     """
     contains logic for determining a crystallographic file format string from the string
     """
@@ -228,7 +228,7 @@ class FoundFormat():
     def is_poscar():
         return True
 
-    def is():
+    def format_is():
         if self.is_cif():
             return 'cif'
         if self.is_poscar():
@@ -290,7 +290,8 @@ class InputSuite():
     
     def _induce_format(self, raw_string:str):
         """ pymatgen contains no logic for this, so here is a simple stuffer """
-        sfmt='POSCAR'
+        
+        sfmt= ThisString(raw_string).format_is()
         self.struct = Structure.from_str(raw_string,
                                          primitive=False, #only for cifs
                                          sort=False,

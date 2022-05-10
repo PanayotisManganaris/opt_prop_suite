@@ -281,9 +281,8 @@ class InputSuite():
             accept='',
             multiple=True,
         )
-        self._get_uploads() #default once
+        self._get_uploads() #default once -- also makes protected files_menu
         self.upload_button.observe(self._get_uploads) #also a callback
-        self.files_menu = self.files_frame
         #widgets.jslink((self.fileout, 'value'), (slider, 'value'))
         # is there an attribute of an output widget that can be direclty linked with the display contents?
         # can I get the html from the grid and jsdlink it into the html in the output widget?
@@ -321,7 +320,8 @@ class InputSuite():
             upload_dict = {k:codecs.decode(v['content']) for k,v in self.upload_button.value.items()}
         files = pd.Series(upload_dict)
         files.name = 'file content'
-        self._files_menu = qgrid.show_grid(files.to_frame())
+        self.files_frame = files.to_frame()
+        self._files_menu = qgrid.show_grid()
         #callback assigned in property method
         
     # string parsing utility

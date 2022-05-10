@@ -26,13 +26,129 @@
 #+latex_header: }
 #+latex_header: \mode<beamer>{\usetheme{Warsaw}}
 #+latex_header: \useoutertheme{miniframes}
-* Input
-** Declarations
-*** Strucutre Processing
-***
-* Output
-** Declarations and
+* Input/Output
+** Inputs                                                          :B_frame:
+:PROPERTIES:
+:BEAMER_env: frame
+:END:
+*** Structure Selection                                     :B_block:BMCOL:
+:PROPERTIES:
+:BEAMER_env: block
+:BEAMER_col: 0.3
+:END:
+1. mpID, POSCARS, ciffs, etc. made into pymatgen structure
+2. pmg struct is encoded as dictionary and sent to tool
+3. Dictionaries can be easily checked for identity
+*** Input Declaration                                       :B_block:BMCOL:
+:PROPERTIES:
+:ID:       a7390de0-589f-4ee7-9659-ca61d1262886
+:BEAMER_env: block
+:BEAMER_col: 0.7
+:END:
+#+begin_export latex
+\tiny
+#+end_export
+#+begin_example
+{'@module': 'pymatgen.core.structure',
+ '@class': 'Structure',
+ 'charge': None,
+ 'lattice': {'matrix': [[1.5920500003918698, -2.7575114888687695, 0.0],
+   [1.5920500003918698, 2.7575114888687695, 0.0],
+   [0.0, 0.0, 5.1551]],
+  'a': 3.1841000007837397,
+  'b': 3.1841000007837397,
+  'c': 5.1551,
+  'alpha': 90.0,
+  'beta': 90.0,
+  'gamma': 120.00000000000001,
+  'volume': 45.26276950032406},
+ 'sites': [{'species': [{'element': 'Zn', 'occu': 1}],
+   'abc': [0.6666666666666666, 0.3333333333333333, 0.5],
+   'xyz': [1.5920500003918696, -0.9191704962895898, 2.57755],
+   'label': 'Zn',
+   'properties': {}},
+  {'species': [{'element': 'Zn', 'occu': 1}],
+   'abc': [0.3333333333333333, 0.6666666666666666, 0.0],
+   'xyz': [1.5920500003918696, 0.9191704962895898, 0.0],
+   'label': 'Zn',
+   'properties': {}},
+  {'species': [{'element': 'O', 'occu': 1}],
+   'abc': [0.6666666666666666, 0.3333333333333333, 0.8803099999999999],
+   'xyz': [1.5920500003918696, -0.9191704962895898, 4.538086080999999],
+   'label': 'O',
+   'properties': {}},
+  {'species': [{'element': 'O', 'occu': 1}],
+   'abc': [0.3333333333333333, 0.6666666666666666, 0.3803099999999999],
+   'xyz': [1.5920500003918696, 0.9191704962895898, 1.9605360809999997],
+   'label': 'O',
+   'properties': {}}]}
+#+end_example
+** Outputs                                                         :B_frame:
+:PROPERTIES:
+:BEAMER_env: frame
+:BEAMER_opt: allowframebreaks
+:END:
+*** structures/chemistries returned for future query              :B_block:
+:PROPERTIES:
+:BEAMER_env: block
+:END:
+Outputs can be queried by key and filtered by conditional matching on values
+- Formula
+- mpID
+- spacegroup
+*** Electronic properties returned for analysis                   :B_block:
+:PROPERTIES:
+:BEAMER_env: block
+:END:
+- [ ] scalers
+  - [ ] bandgap
+  - [ ] fermi energy
+  - [ ] charge densities
+  - [ ] raman/IR cutoff
+  - [ ] UV cutoff
+- [-] spectra
+  - [X] raman/IR
+  - [ ] eDoS + Band-structure
+  - [ ] phonon dispersion
+  - [ ] SLME (these might be relegated to post processing)
+  - [ ] PV FOM
+*** COMMENT Mechanical properties returned for analysis                   :B_block:
+:PROPERTIES:
+:BEAMER_env: block
+:END:
+Note: these returns are probably conditional on the pipeline...
+- [ ] tensors -- enabling analysis of optical response to strain effect
+  - [ ] forces
+  - [ ] stress
 
+*** COMMENT Fallbacks                                                     :B_block:
+:PROPERTIES:
+:BEAMER_env: block
+:END:
+
+* COMMENT Validation
+** TODO Check Units
+Oh bloody hell. (alat) is literally use the A lattice parameter as the
+standard unit.  (alat = 1.00) is literally just consider A to
+be 1. That way, if the input is in ang, bohr, or whatever and A = 5
+[whatevers], then the unit is implicit.
+
+This might be nonsense for calculations that actually depend on
+knowing the magnitude of forces, and not just their rates of change?
+** Run validation structures
+*** Diamond-zincblende
+**** [#1] Si
+**** [#3] Zn Su
+**** Oxides are hard
+**** Don't trust anybody
+materials project doesn't always have good structures. In fact, there
+are a fair few bad structures due to historical bugs in cif file conversions
+
+so. Verify Everything. Trust Nothing.
+** TODO XC functional -- should be a choice like pseudo-potential
+pw.x keyword: input_dft -- preferably an optional input
+if "not supplied" the dft functional used is that read from the pp.
+it's an expert setting
 * Results
 ** Kat
 I'm not going to dig too much into beamer / org-mode formatting, so I'm just adding my contributions here since I can't preview at the moment

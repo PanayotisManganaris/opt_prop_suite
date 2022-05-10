@@ -255,11 +255,12 @@ class InputSuite():
     def __init__(self, QueryObj):
         self.Q = QueryObj
         # inspection widgets
+        self.remoteout = widgets.Output()
+        self.filesout = widgets.Output()
         self.plotout = widgets.Output(layout={'border': '5px solid black'})
-        self.filesout = widgets.Output(layout={'border': '5px solid black'})
         # remote interface widgets
-        self.remote_menu = qgrid.show_grid(self.Q.frame) #make grid widget with convenience method
-        self.remote_menu.observe(self._process_pick_remote)
+        self._remote_menu = qgrid.show_grid(self.Q.frame) #make protected grid widget with convenience method
+        #callback assigned in property method
         # write widgets
         self.copybox = widgets.Textarea(
             value="",
@@ -282,14 +283,27 @@ class InputSuite():
         )
         self._get_uploads() #default once
         self.upload_button.observe(self._get_uploads) #also a callback
+        self.files_menu = self.files_frame
         #widgets.jslink((self.fileout, 'value'), (slider, 'value'))
         # is there an attribute of an output widget that can be direclty linked with the display contents?
         # can I get the html from the grid and jsdlink it into the html in the output widget?
 
     #menu callbacks and display handlers
+
+    @property
+    def remote_menu(self):
+        self.remote_menu = self.Q.frame
+        with self.remoteout:
+            clear_output(wait=True)
+            self._remote_menu.observe(self._process_pick_remote)
+            return self._remote_menu
+
+    @remote_menu.setter
+    def remote_menu(self, remote_items):
+        self._remote_menu = qgrid.show_grid(remote_items)
+
     @property
     def files_menu(self):
-        self.files_menu = self.files_frame
         with self.filesout:
             clear_output(wait=True)
             self._files_menu.observe(self._process_pick_file)
@@ -300,13 +314,15 @@ class InputSuite():
         self._files_menu = qgrid.show_grid(uploads)
 
     def _get_uploads(self, *args):
+        print('boo')
         if not self.upload_button.value:
             upload_dict = {'alert': 'upload a batch of files to select from here'}
         else:
             upload_dict = {k:codecs.decode(v['content']) for k,v in self.upload_button.value.items()}
         files = pd.Series(upload_dict)
         files.name = 'file content'
-        self.files_frame = files.to_frame()
+        self._files_menu = qgrid.show_grid(files.to_frame())
+        #callback assigned in property method
         
     # string parsing utility
     def _induce_format(self, raw_string:str):

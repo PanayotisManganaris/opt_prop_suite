@@ -13,170 +13,178 @@
 #+creator: Emacs 27.2 (Org mode 9.5)
 #+cite_export:
 * Overview
-This project repository is hosted on Github for accessibility and
-convenience.
-
 This README also serves as a design document and as a log of
 collaboration arrangements
 * Installation for Developers
 This Jupyter Notebook Simtool is intended for publication on
-Nanohub.org where it will be user facing
+Nanohub.org where it will be user facing.
 
-User and Developer dependencies are stated in pyproject.toml
+It depends only on the packages included in nanoHUB's anaconda-6
+standard python3 kernel. A reproducible list of these dependencies is
+not included with this repository.
 
-*NOTICE: THE NANOHUB INSTALLATION INSTRUCTIONS ARE NOT YET MATURE.*
-THIS TOOL REQUIRES DEPENDENCIES NOT FULLY PROVIDED BY THE ANACONDA-6
-BASE ENVIRONMENT PROVIDED TO ALL USERS. I'm working on it....
-
-The main problems:
-- GLIBC is still not accessible by user defined environments
-- Any given user defined environment needs to define a jupyter kernel
-  in order to be usable from the web interface.
-  - for some reason, the link cannot be established. This may just be due to the absence of glibc bindings.
-
-** Local Installation
-To install and contribute to the development version on any system
-simply clone the repository to a suitable working directory. Then,
-either use your environment manager of choice to install poetry or let
-poetry define its own virtual environment and then execute poetry
-install in the repo root.
-
-In this case, the python dependencies should work, however you cannot
-test run the simtool short of setting up a hubzero server with quantum
-espresso yourself.
 ** Nanohub Installation
-The simtool is designed to utilize nanohub's HPC resources in running
-quantum espresso DFT simulation by submitting runs via python hublib's
-slurm integration.
+To contribute to the development of this Simtool. Simply clone the
+repository to a suitable working directory *on your nanoHUB
+filesystem*.
 
-To use nanohub's https://nanohub.org/tools/jupyter development
-environment, launch a terminal under the "new" menu in the jupyter
-browser and navigate to a preferred working directory, Then create a
-conda virtual environment. I call mine "ops" for opt_prop_suite.
+This can be done by navigating to https://nanohub.org/tools/jupyter
 
-Populate the environment with glib from conda forge (this includes
-functioning python core libraries). Then use pip to install poetry.
+Launch the tool and start a terminal from the "new" dropdown to the
+right of the jupyter filebrowser. Then run the git clone command.
+Alternatively, use ssh.
 
-#+begin_src bash
-  conda create --name ops -c conda-forge glib
-  conda activate ops
-  pip install poetry
-#+end_src
+Then launch the relevant notebooks. Be sure to commit any
+changes. Create new branches for new features.
 
-Then, clone the repository to a suitable working directory in your
-nanohub home.
-
-Finally, use poetry to install the opt_prop_suite dependencies.
-
-The dependencies do take up a fair fraction of the 10GB nanohub users
-are allocated.
-
-#+begin_src bash
-  git clone https://github.com/PanayotisManganaris/opt_prop_suite.git
-  poetry install
-#+end_src
-
-then launch compute_spectra_workflow.ipynb to use the simtool.
-** Adding Dependencies
-Packaging is the easiest way to make python development portable
-because the environment can simply be committed with the rest of the
-repository.
-
-If in the course of development you require packages not defined in
-the pyproject.toml you must install them using poetry. This will take
-care of updating the configuration file and install the (exclusively
-pypi) dependency.
-
-#+begin_src bash
-  poetry add <package_name>
-#+end_src
-
-Then commit the poetry.lock and pyproject.toml both back to the
-repository to share the dependency with other developers.
 * Tasks Division
-** everyone
-contribute runs to "successes and failures" presentation
-- [X] find a few runs that fail outright
-  - log what you find here, for everything. put screenshots in Deliverables subdirectory
-  - Kat: I updated the workflow to allow iterative runs, I've been testing on my own and I'll add results tables to the org-mode file in the deliverables folder as I get them. So far, it's definitely sensitive to k-point density and energy cutoffs. Very frustrating
-- [ ] find a few runs that return bad spectra
-- [ ] find a few runs that run well
+** shared
+- [ ] simtool v0.8.0
+  - discrete, linked simtools
+  - focus on doing one job well
+  - ensure robust hashing
 ** Kat
-*** Frontend Design
-- [X] Structure Visualization (updated to plotly)
-- [X] Widget Based User GUI (added non-widget iterative section, need to implement iterative widgets)
-*** Frontend Presentation
-- [ ] read only notebook?
-- [ ] rappture toolkit (do we want to pursue this option?)
-supposedly works to auto-generate guis similarly to how
-simtool auto-generates databases?
-- [X] hide code blocks
+- [X] quantum espresso simulation input files
+- [X] crystal visualization
+- [X] interface widgets
+- [-] huge amounts of troubleshooting
+  - [-] calculation convergence
+    - [X] SiO
+    - [ ] ZnO -- weirdness
+  - [X] settings testing
+  - [ ] pseudopotentials
+  - [ ] functionals
+  - [ ] aaaaaaaaa
+- [ ] phonon dispersion and electronic structure extraction
 ** Panos
-*** Standardize Development Environment
-qgrid apparently is a big hassle to install on nanohub? user databrowser gui based on it
-
-*** Obtain Results
-500-700 sample structures chosen by Shivam
-get cutoff frequency at the maximum of final peak (see optprop for optimizer)
-*** Optimize Kpath meshing
-for Raman Computation
-- [ ] SeekPath vs pwtools?
-*** INACTIVE Optimize Qpath meshing
-for phonon dispersions
+- [X] simtool v0.0.01
+- [X] simtool v0.1.50
+- [X] installed 670raman tool
+- [ ] gui
 ** Joji
-*** Outline Analysis Simtool
-- [ ] postprocessing section
-  - [ ] peak-broadening script
+- [X] spectrum smoothing for post processing
+- [ ] phonon dispersion/DOS analysis
+- [ ] optical spectra
 * Authors
+** original
 [2021-12-18 Sat]
-co-authors: Kat Nykiel, Paul Tanmoy, Panos Manganaris, Shivam Tripathi, Saswat Mishra
-senior author: Dr.Ale Strachan, Dr. Arun Kanakkithodi
+co-authors: Kat Nykiel, Paul Tanmoy, Panos Manganaris, Shivam
+Tripathi, Saswat Mishra
+
+senior author: Dr.Ale Strachan, Dr. Arun Mannodi-Kanakkithodi
+
 acknowledgements: Yuxuan Zhang for initial IR spectra
+** additional
 [2022-01-19 Wed]
+
 Joji
-get DOS, phonon dispersion, optical spectra
+
 * declaring in/out
+** Deterministic
+- logging should be set to full resolution
+  - all checks should be efficient or should be eliminated
+- compute resources should be conservatively estimated from electron count
 ** in
-structures (matproj POSCARS, ciffs, etc)
+- [ ] structure dictionary
+  - [ ] credit pymatgen for the struct_dict
+  - [ ] put it at the top
+- [ ] define kpoint settings in terms of input density
+  - [ ] update kpoint descriptions
+- [ ] focus on crystals -- adjust epsil accordingly
+  - [ ] epsil decides dielectric constant calculations?
+  - [ ] decide and fix.
+- [ ] pp needs to be a choice
+  - [ ] restrict available pps according to the viability of the XC functional
+  - [ ] select them all at once. set descriptions accordingly.
 
-critically, make sure any irregular inputs can be indexed when all is
-said and done
+** TODO out
+if an output is not recorded, the simtool will fail to hash.
 
-** out
-notice -- .wfc files and wfc.dat files should be removed
+so. to improve flexibility of simulation pipelines, outputs should be
+hashed in stages. Outputs needed for the operation of another simtool
+should be indexed individually.
 
-double critical: if an output is not recorded, the simtool will fail to hash
+notice -- .wfc files and wfc.dat files should be removed (diskio option)
 
-more outputs == more chances that work will need to be repeated
+*** relax_sim.ipynb
+- [ ] calculation validation logic:
+  - [ ] log validation as output ("calculation converged")
+  - [ ] return nothing if failed
+- [ ] Chemical Formula
+- [ ] relaxed structure
+  - [ ] space group
+- [ ] stress tensor -- minimized here... computed elsewhere?
+- [ ] atomic forces tensor
 
-User Queries have to work on the outputs
-- all indexable strucutre/chemistries
-  - chemical
-  - mpid
-  - spacegroup
-- energy
-- charge densities
-- forces
-- stress
-- phonon dispersion
-- raman/IR
-  - IR cutoff
-- fermi energy
-- Bandgap
-- eDoS
-- UV cutoff
-- absorption coefficient vs phonon
-- SLME
-- PV_FOM
-* Minutia of Simulation Settings
-** cell vs atomic relaxation
-to enable study of strain effects on optical properties, we offer the
-option to run the simulation pipline with OR without an initial VC-relaxation
-*** conditional relaxation
-"check" flag which can reassure user of "reasonable" structures.
-*** alternatively:
-always do atomic/force relax relaxation and let the user decide which
+*** scf_sim.ipynb
+- [ ] calculation validation logic:
+  - [ ] log validation as output ("calculation converged")
+  - [ ] return nothing if failed
+- [ ] Chemical Formula
+- [ ] band gap
+- [ ] dielectric constant
+- [ ] total energy
+- [ ] fermi energy? -- dos here?
+- [ ] spectra
+  - [ ] eDOS -- ?
+- [ ] charge density
+
+*** ph_sim.ipynb
+- [ ] calculation validation logic:
+  - [ ] log validation as output ("calculation converged")
+  - [ ] return nothing if failed
+- [ ] Chemical Formula
+- [ ] spectra
+  - [ ] phonon dispersion -- Kat?
+- [ ] IR cutoff
+- [ ] UV cutoff
+
+*** dynmat_sim.ipynb
+- [ ] calculation validation logic:
+  - [ ] log validation as output ("calculation converged")
+  - [ ] return nothing if failed
+- [ ] Chemical Formula
+- [ ] spectra
+  - [ ] IR
+  - [ ] Raman
+  - [ ] UV -- ?
+- [ ] IR cutoff -- max peak
+- [ ] UV cutoff -- max peak
+
+*** post-processing
+- [ ] SLME -- to be translated to cmcl
+- [ ] PV_FOM -- to be translated to cmcl
+- [ ] absorption coefficient vs phonon dispersion?
 * User Instructions
-** optical property calculation
+** pipeline assembly
+after selecting a structure, you are prompted to assemble a simulation
+pipeline. This is a list of simulation steps that will be taken. At
+each stage, the state of the submitted tool and the returned results
+are hashed and entered into the nanoHUB database for future reference.
+
+A pipeline consists of the following.
+*** relaxation
+a relaxation step is necessary
+
+you have a choice between variable cell relaxation and atomic force
+relaxation. The latter enables the study of strain effects on optical
+properties.
+
+One relaxation must be performed to ensure further results are
+possible and physically meaningful.
+**** cell vs atomic relaxation
+Running an initial VCrelax will ensure minimal strain is present in
+the crystal structure.
+
+Atomic relaxation relaxes the atoms into an equilibrium position
+without chafing the lattice constants. Thereby ensuring a physical
+structure is obtained, but permitting it to be strained in some
+way.
+*** optical property calculation
 ** assessing results
-** data management
+*** calculation verification
+the post processing notebook can offer a history of experiments from
+materials project results to check that the simulation results
+compares to known
+*** validation
+validation is left to the user

@@ -256,6 +256,7 @@ class InputSuite():
         self.Q = QueryObj
         # inspection widgets
         self.plotout = widgets.Output(layout={'border': '5px solid black'})
+        self.filesout = widgets.Output(layout={'border': '5px solid black'})
         # remote interface widgets
         self.remote_menu = qgrid.show_grid(self.Q.frame) #make grid widget with convenience method
         self.remote_menu.observe(self._process_pick_remote)
@@ -279,24 +280,37 @@ class InputSuite():
             accept='',
             multiple=True,
         )
-        # link a callback to the fileupload that intercepts the values and populates a df??
-        # getting content from the upload's value:
-        #input_files = ss.upload_button.value['POSCAR']['content']
-        #for input_file in input_files:
-        # print(codecs.decode(input_file, encoding="utf-8"))
-        # self.upload_button.value
-        self.file_menu = qgrid.show_grid(self.Q.frame)
-        # self.file_menu.observe(self._process_pick_file)
-    
+        self._get_uploads() #default once
+        self.upload_button.observe(self._get_uploads) #also a callback
+
+
+    #menu callbacks and display handlers
+    @property
+    def files_menu(self):
+        with self.filesout:
+            self._files_menu = qgrid.show_grid(self.files_frame)
+            self._files_menu.observe(self._process_pick_file)
+            return self._files_menu
+
+    def _get_uploads(self, *args):
+        if not self.upload_button.value:
+            upload_dict = {'alert': 'upload a batch of files to select from here'}
+        else:
+            upload_dict = {k:codecs.decode(v['content']) for k,v in self.upload_button.value.items()}
+        files = pd.Series(upload_dict)
+        files.name = 'file content'
+        self.files_frame = files.to_frame()
+        
+    # string parsing utility
     def _induce_format(self, raw_string:str):
         """ pymatgen contains no logic for this, so here is a simple stuffer """
-        
         sfmt= ThisString(raw_string).format_is()
         self.struct = Structure.from_str(raw_string,
                                          primitive=False, #only for cifs
                                          sort=False,
                                          fmt=sfmt) #currently hardcoded
 
+    #plotting callbacks:
     def _process_input(self, event):
         """ callback for copybox """
         with self.plotout:
@@ -315,11 +329,13 @@ class InputSuite():
 
     def _process_pick_file(self, event):
         """ callback for menu """
-        grid = self.file_menu
+        grid = self.files_menu
         with self.plotout:
             clear_output(wait=True)
-            uploaded_file = grid.get_changed_df().at[grid.get_selected_rows()[0], 0] #not .at for metadata...
-            raw_string = codecs.decode(uploaded_file.value['POSCAR']['content']) #obtain index from selection...^
+
+
+            uploads = grid.get_changed_df().at[grid.get_selected_rows()[0], 0] #not .at for metadata...
+            raw_string = codecs.decode(uploads.value['POSCAR']['content']) #obtain index from selection...^
             self.struct = self._induce_format()
             struct_plot(self.struct)
 

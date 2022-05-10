@@ -282,15 +282,22 @@ class InputSuite():
         )
         self._get_uploads() #default once
         self.upload_button.observe(self._get_uploads) #also a callback
-
+        #widgets.jslink((self.fileout, 'value'), (slider, 'value'))
+        # is there an attribute of an output widget that can be direclty linked with the display contents?
+        # can I get the html from the grid and jsdlink it into the html in the output widget?
 
     #menu callbacks and display handlers
     @property
     def files_menu(self):
+        self.files_menu = self.files_frame
         with self.filesout:
-            self._files_menu = qgrid.show_grid(self.files_frame)
+            clear_output(wait=True)
             self._files_menu.observe(self._process_pick_file)
             return self._files_menu
+
+    @files_menu.setter
+    def files_menu(self, uploads):
+        self._files_menu = qgrid.show_grid(uploads)
 
     def _get_uploads(self, *args):
         if not self.upload_button.value:

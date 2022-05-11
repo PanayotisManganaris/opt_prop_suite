@@ -30,7 +30,9 @@ class Authenticate():
     - nomad?
     """
     def __init__(self):
+        self.mpout = widgets.Output()
         #AutoAuth Checks
+        self.force = False
         self.checkmp = os.path.isfile(os.path.expanduser("~/.mpkey.txt"))
         #Control and Base Widgets
         self.authbox = widgets.Text(value="", description='Token', disabled=False)
@@ -39,48 +41,46 @@ class Authenticate():
         self.renew_button = widgets.Button(description='Renew Tokens',
                                            disabled=False,
                                            button_style='warning')
-        def forceAuth(event):
-            setattr(self, 'force', True)
-            #time.sleep(1.0)
-            display(Javascript("require(['base/js/namespace'], function(IPython) {IPython.notebook.run_cells();});"))
-            #this does successfully set the force attribute on button press
-            #but, it seems the cell is not properly rerun afterwards,
-            #requiring manual re-run to display auth-suite in force mode..... global variable? inherit force? more JS?
-        self.renew_button.on_click(forceAuth)
+        self.renew_button.on_click(self.forceAuth)
         #Auth widgets
-        self.mpkey = partial(self.token, authmethod=self._mpkey, check=self.checkmp)
+        self.mpkey = partial(self.token, out=self.mpout, authmethod=self._mpkey, check=self.checkmp)
 
-    def token(self, authmethod, check):
+    def forceAuth(self, event):
+        self.force = True
+        self.mpkey()
+        self.force = False        
+
+    def token(self, out, authmethod, check):
         """
         generic conditional authentication
         """
-        if check and not hasattr(self, "force"):
-            return self.good
-        else:
-            self.authbox.on_submit(authmethod)
-            return self.authbox
-
-    @staticmethod
-    def _mpkey(text):
+        with out:
+            clear_output(wait=True)
+            if check and not self.force:
+                display(self.good)
+            else:
+                self.authbox.on_submit(authmethod)
+                display(self.authbox)
+        return out
+    
+    def _mpkey(self, text):
         """
         mpkey authmethod -- write user's materials project key to a
         file which can be accessed by later instances of
         MPRester. Delete key from kernel vars dict.
         """
-        mpkey = text.value
-        text.close() 
-        try:
-            if not mpkey.isalnum():
-                raise TypeError('Wrong Key')
-            if mpkey is None:
-                raise TypeError('Empty')
+        mpkey = self.authbox.value
+        self.authbox.value = ""
+        with self.mpout:
+            clear_output(wait=True)
+            assert mpkey, 'MP keys cannot be empty strings'
+            assert mpkey.isalnum(), 'MP keys should consist of numbers and letters'
             with open(os.path.expanduser('~/.mpkey.txt'), 'w') as keyfile:
                 keyfile.write(mpkey)
             del mpkey
             os.chmod(os.path.expanduser('~/.mpkey.txt'), stat.S_IREAD | stat.S_IWRITE)
-            print("Key is Viable -- if your queries return authentication errors, use the 'Renew Token' button to try again")
-        except TypeError:
-            print("Something seems wrong with your key")
+            display(self.good)
+            print("Key is Viable -- if your queries return authentication errors, try reentering your key")
 
 class MPQuery():
     """ The Materials Project Query Object used by this tool """
@@ -321,7 +321,7 @@ class InputSuite():
         files = pd.Series(upload_dict)
         files.name = 'file content'
         self.files_frame = files.to_frame()
-        self._files_menu = qgrid.show_grid()
+        self._files_menu = qgrid.show_grid(self.files_frame)
         #callback assigned in property method
         
     # string parsing utility

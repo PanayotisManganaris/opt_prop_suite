@@ -4,6 +4,8 @@ import pandas as pd
 import numpy as np
 import qgrid
 from pymatgen.ext.matproj import MPRester
+
+#data handling
 from pymatgen.core import Structure
 
 #simtool loading and interface
@@ -30,6 +32,7 @@ class Authenticate():
     - nomad?
     """
     def __init__(self):
+        #display managers
         self.mpout = widgets.Output()
         #AutoAuth Checks
         self.force = False
@@ -69,18 +72,18 @@ class Authenticate():
         file which can be accessed by later instances of
         MPRester. Delete key from kernel vars dict.
         """
-        mpkey = self.authbox.value
-        self.authbox.value = ""
+        mpkey = text.value
+        text.value = ""
         with self.mpout:
             clear_output(wait=True)
-            assert mpkey, 'MP keys cannot be empty strings'
-            assert mpkey.isalnum(), 'MP keys should consist of numbers and letters'
+            assert mpkey, 'MP keys cannot be empty strings, entry not written'
+            assert mpkey.isalnum(), 'MP keys should consist of numbers and letters, entry not written'
             with open(os.path.expanduser('~/.mpkey.txt'), 'w') as keyfile:
                 keyfile.write(mpkey)
             del mpkey
             os.chmod(os.path.expanduser('~/.mpkey.txt'), stat.S_IREAD | stat.S_IWRITE)
             display(self.good)
-            print("Key is Viable -- if your queries return authentication errors, try reentering your key")
+            print("If your MP queries return authentication errors, try reentering your key")
 
 class MPQuery():
     """ The Materials Project Query Object used by this tool """

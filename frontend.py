@@ -24,7 +24,8 @@ import codecs
 
 class Authenticate():
     """
-    Container class for user authentication functions
+    Nanohub friendly user authentication widgets.
+    If users already have a key, it is not then requested by default.
 
     Provides interfaces to authenticate into multiple data providers
     - materials project
@@ -46,14 +47,14 @@ class Authenticate():
                                            button_style='warning')
         self.renew_button.on_click(self.forceAuth)
         #Auth widgets
-        self.mpkey = partial(self.token, out=self.mpout, authmethod=self._mpkey, check=self.checkmp)
+        self.mpkey = partial(self._token, out=self.mpout, authmethod=self._mpkey, check=self.checkmp)
 
     def forceAuth(self, event):
         self.force = True
         self.mpkey()
         self.force = False        
 
-    def token(self, out, authmethod, check):
+    def _token(self, out, authmethod, check):
         """
         generic conditional authentication
         """
@@ -86,7 +87,10 @@ class Authenticate():
             print("Entry written. If your MP queries return authentication errors, try reentering your key")
 
 class MPQuery():
-    """ The Materials Project Query Object used by this tool """
+    """
+    The Materials Project Mutable Query Object. Used to get and apply MP data.
+    Note: structure retrieval requires "query" return list include the "task_id" key
+    """
     def __init__(self, content=[], **kwargs):
         """current stopgap:
         if OPTIMATE is hard to implement, just make case-by-case query
@@ -97,9 +101,9 @@ class MPQuery():
         """
         self.authfile = kwargs.get('authfile', "~/.mpkey.txt")
         self.query = kwargs.get('query', ({ "crystal_system": "cubic"},
-                                          ["task_id","pretty_formula","formula",
-                                           "elements","e_above_hull", "spacegroup.number",
-                                           "band_gap", "crystal_system"]))
+                                          ["task_id","formula", "elements", "e_above_hull",
+                                           "spacegroup.number", "band_gap", "crystal_system"]))
+        self.dbcode_key = "task_id"
         self.rester = self._make_rester()
         self.frame = pd.DataFrame(self.get_content(content)) #mutable
 
@@ -186,7 +190,10 @@ def struct_plot(struct):
 
 class QueryPanel():
     """
-    widget class
+    widget class for performing queries. Currently necessary to use
+    even if a tool does not require remote access. InputSuite must be
+    instantiated using QueryPanel
+    
     1. interactively instantiate and swap between query objects using the Toggles widget
     2. Collect and display query status with the progressout widget
     wishlist: customize query scope using a panel of interactive sliders
@@ -210,8 +217,8 @@ class QueryPanel():
         self.InputSuite = None
 
     def _assign_data_on_pick(self, change):
-        """ observes update to the traitlets bunch... could maybe be optimized"""
-        with self.progressout: #stdout? captured by default...
+        """ observes update to the traitlets bunch """
+        with self.progressout: #stdout captured by default
             if self.toggles.value == "None":
                 self.Q = FakeQuery()
             elif self.toggles.value == "Materials Project":
@@ -222,18 +229,18 @@ class QueryPanel():
 
 class ThisString():
     """
-    contains logic for determining a crystallographic file format string from the string
+    contains logic for determining a crystallographic file format string from the string content
     """
     def __init__(self, string):
         self.string = string
 
-    def is_cif():
+    def is_cif(self):
         return False
 
-    def is_poscar():
+    def is_poscar(self):
         return True
 
-    def format_is():
+    def format_is(self):
         if self.is_cif():
             return 'cif'
         if self.is_poscar():
@@ -292,9 +299,9 @@ class InputSuite():
     def remoteout(self):
         with self._remoteout:
             clear_output(wait=True)
-            _remote_menu = qgrid.show_grid(self.QP.Q.frame) #make protected grid widget with convenience method
-            _remote_menu.observe(self._process_pick_remote)
-            display(_remote_menu)
+            self._remote_menu = qgrid.show_grid(self.QP.Q.frame) #make protected grid widget with convenience method
+            self._remote_menu.observe(self._process_pick_remote)
+            display(self._remote_menu)
         return self._remoteout
 
     @property
@@ -303,10 +310,10 @@ class InputSuite():
             clear_output(wait=True)
             self._files_menu = qgrid.show_grid(self.files_frame)
             self._files_menu.observe(self._process_pick_file)
+            display(self._files_menu)
         return self._filesout
 
     def _get_uploads(self, *args):
-        print('boo')
         if not self.upload_button.value:
             upload_dict = {'alert': 'upload a batch of files to select from here'}
         else:
@@ -319,7 +326,7 @@ class InputSuite():
     # string parsing utility
     def _induce_format(self, raw_string:str):
         """ pymatgen contains no logic for this, so here is a simple stuffer """
-        sfmt= ThisString(raw_string).format_is()
+        sfmt = ThisString(raw_string).format_is()
         self.struct = Structure.from_str(raw_string,
                                          primitive=False, #only for cifs
                                          sort=False,
@@ -347,9 +354,8 @@ class InputSuite():
         grid = self._files_menu
         with self.plotout:
             clear_output(wait=True)
-            raw_string = grid.get_changed_df().at[grid.get_selected_rows()[0], 0]
-            self._induce_format(upload)
-            self.struct = self._induce_format()
+            raw_string = grid.get_changed_df().iloc[grid.get_selected_rows()[0], 0]
+            self._induce_format(raw_string)
             struct_plot(self.struct)
 
 class SimSettingSuite():

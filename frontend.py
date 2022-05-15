@@ -1,4 +1,8 @@
-"""library of widgets exposed to user via Compute_Spectra_Workflow notebook"""
+"""
+library of widgets facilitating material structure input intended for
+nanohub simtools to be published using the Anaconda2020.11 jupyter
+tool default kernel.
+"""
 #data tools
 import pandas as pd
 import numpy as np
@@ -126,6 +130,7 @@ class MPQuery():
 class FakeQuery():
     """ A minimal Query Object serving both default and debugging purposes """
     def __init__(self, content=[], Debug=False, **kwargs):
+        self.dbcode_key = "task_id"
         self.frame = pd.DataFrame(["You must authenticate into a remote data source and run a query to use this interface."],
                                   index=["alert!"], columns=["attention!"])
         if Debug:
@@ -345,7 +350,7 @@ class InputSuite():
         grid = self._remote_menu
         with self.plotout:
             clear_output(wait=True)
-            sid = grid.get_changed_df().at[grid.get_selected_rows()[0],'task_id'] #hardcoded for mp. id key should depend on Q
+            sid = grid.get_changed_df().iloc[grid.get_selected_rows()[0]].loc[self.QP.Q.dbcode_key]
             self.struct = self.QP.Q.get_structure(sid)
             struct_plot(self.struct)
 

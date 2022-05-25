@@ -150,6 +150,10 @@ notice -- .wfc files and wfc.dat files should be removed (diskio option)
   - [ ] UV -- ?
 - [ ] IR cutoff -- max peak
 - [ ] UV cutoff -- max peak
+**** test
+- [ ] Si2
+- [ ] GaN
+- [ ] GaAr
 
 *** post-processing
 - [ ] SLME -- to be translated to cmcl

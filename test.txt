@@ -1,3 +1,0 @@
-ignore this, it's just a test of my git integration from atom
-switching to a new branch
--kat

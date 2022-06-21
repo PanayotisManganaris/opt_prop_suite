@@ -1,9 +1,15 @@
-"""library of widgets exposed to user via Compute_Spectra_Workflow notebook"""
+"""
+library of widgets facilitating material structure input intended for
+nanohub simtools to be published using the Anaconda2020.11 jupyter
+tool default kernel.
+"""
 #data tools
 import pandas as pd
 import numpy as np
 import qgrid
 from pymatgen.ext.matproj import MPRester
+
+#data handling
 from pymatgen.core import Structure
 
 #simtool loading and interface
@@ -22,7 +28,8 @@ import codecs
 
 class Authenticate():
     """
-    Container class for user authentication functions
+    Nanohub friendly user authentication widgets.
+    If users already have a key, it is not then requested by default.
 
     Provides interfaces to authenticate into multiple data providers
     - materials project
@@ -30,7 +37,10 @@ class Authenticate():
     - nomad?
     """
     def __init__(self):
+        #display managers
+        self.mpout = widgets.Output()
         #AutoAuth Checks
+        self.force = False
         self.checkmp = os.path.isfile(os.path.expanduser("~/.mpkey.txt"))
         #Control and Base Widgets
         self.authbox = widgets.Text(value="", description='Token', disabled=False)
@@ -39,51 +49,52 @@ class Authenticate():
         self.renew_button = widgets.Button(description='Renew Tokens',
                                            disabled=False,
                                            button_style='warning')
-        def forceAuth(event):
-            setattr(self, 'force', True)
-            #time.sleep(1.0)
-            display(Javascript("require(['base/js/namespace'], function(IPython) {IPython.notebook.run_cells();});"))
-            #this does successfully set the force attribute on button press
-            #but, it seems the cell is not properly rerun afterwards,
-            #requiring manual re-run to display auth-suite in force mode..... global variable? inherit force? more JS?
-        self.renew_button.on_click(forceAuth)
+        self.renew_button.on_click(self.forceAuth)
         #Auth widgets
-        self.mpkey = partial(self.token, authmethod=self._mpkey, check=self.checkmp)
+        self.mpkey = partial(self._token, out=self.mpout, authmethod=self._mpkey, check=self.checkmp)
 
-    def token(self, authmethod, check):
+    def forceAuth(self, event):
+        self.force = True
+        self.mpkey()
+        self.force = False        
+
+    def _token(self, out, authmethod, check):
         """
         generic conditional authentication
         """
-        if check and not hasattr(self, "force"):
-            return self.good
-        else:
-            self.authbox.on_submit(authmethod)
-            return self.authbox
-
-    @staticmethod
-    def _mpkey(text):
+        with out:
+            clear_output(wait=True)
+            if check and not self.force:
+                display(self.good)
+            else:
+                self.authbox.on_submit(authmethod)
+                display(self.authbox)
+        return out
+    
+    def _mpkey(self, text):
         """
         mpkey authmethod -- write user's materials project key to a
         file which can be accessed by later instances of
         MPRester. Delete key from kernel vars dict.
         """
         mpkey = text.value
-        text.close() 
-        try:
-            if not mpkey.isalnum():
-                raise TypeError('Wrong Key')
-            if mpkey is None:
-                raise TypeError('Empty')
+        text.value = ""
+        with self.mpout:
+            clear_output(wait=True)
+            assert mpkey, 'MP keys cannot be empty strings, entry not written'
+            assert mpkey.isalnum(), 'MP keys should consist of numbers and letters, entry not written'
             with open(os.path.expanduser('~/.mpkey.txt'), 'w') as keyfile:
                 keyfile.write(mpkey)
             del mpkey
             os.chmod(os.path.expanduser('~/.mpkey.txt'), stat.S_IREAD | stat.S_IWRITE)
-            print("Key is Viable -- if your queries return authentication errors, use the 'Renew Token' button to try again")
-        except TypeError:
-            print("Something seems wrong with your key")
+            display(self.good)
+            print("Entry written. If your MP queries return authentication errors, try reentering your key")
 
 class MPQuery():
-    """ The Materials Project Query Object used by this tool """
+    """
+    The Materials Project Mutable Query Object. Used to get and apply MP data.
+    Note: structure retrieval requires "query" return list include the "task_id" key
+    """
     def __init__(self, content=[], **kwargs):
         """current stopgap:
         if OPTIMATE is hard to implement, just make case-by-case query
@@ -94,9 +105,9 @@ class MPQuery():
         """
         self.authfile = kwargs.get('authfile', "~/.mpkey.txt")
         self.query = kwargs.get('query', ({ "crystal_system": "cubic"},
-                                          ["task_id","pretty_formula","formula",
-                                           "elements","e_above_hull", "spacegroup.number",
-                                           "band_gap", "crystal_system"]))
+                                          ["task_id","formula", "elements", "e_above_hull",
+                                           "spacegroup.number", "band_gap", "crystal_system"]))
+        self.dbcode_key = "task_id"
         self.rester = self._make_rester()
         self.frame = pd.DataFrame(self.get_content(content)) #mutable
 
@@ -119,6 +130,7 @@ class MPQuery():
 class FakeQuery():
     """ A minimal Query Object serving both default and debugging purposes """
     def __init__(self, content=[], Debug=False, **kwargs):
+        self.dbcode_key = "task_id"
         self.frame = pd.DataFrame(["You must authenticate into a remote data source and run a query to use this interface."],
                                   index=["alert!"], columns=["attention!"])
         if Debug:
@@ -183,7 +195,10 @@ def struct_plot(struct):
 
 class QueryPanel():
     """
-    widget class
+    widget class for performing queries. Currently necessary to use
+    even if a tool does not require remote access. InputSuite must be
+    instantiated using QueryPanel
+    
     1. interactively instantiate and swap between query objects using the Toggles widget
     2. Collect and display query status with the progressout widget
     wishlist: customize query scope using a panel of interactive sliders
@@ -203,32 +218,34 @@ class QueryPanel():
                       "Contact the Materials Project REST API for semiconductor information"]
         )
         self.Q = FakeQuery() #default
-        self.toggles.observe(self._assign_data_on_pick)
+        self.toggles.observe(self._assign_data_on_pick, names='value')
+        self.InputSuite = None
 
     def _assign_data_on_pick(self, change):
-        """ observes update to the traitlets bunch, doesn't use it... too much throughput"""
-        with self.progressout:
+        """ observes update to the traitlets bunch """
+        with self.progressout: #stdout captured by default
             if self.toggles.value == "None":
                 self.Q = FakeQuery()
             elif self.toggles.value == "Materials Project":
                 self.Q = MPQuery()
             elif self.toggles.value == "Debug":
                 self.Q = FakeQuery(Debug=True)
+        self.InputSuite.remoteout #Must instantiate QueryPanel then InputSuite
 
 class ThisString():
     """
-    contains logic for determining a crystallographic file format string from the string
+    contains logic for determining a crystallographic file format string from the string content
     """
     def __init__(self, string):
         self.string = string
 
-    def is_cif():
+    def is_cif(self):
         return False
 
-    def is_poscar():
+    def is_poscar(self):
         return True
 
-    def format_is():
+    def format_is(self):
         if self.is_cif():
             return 'cif'
         if self.is_poscar():
@@ -252,14 +269,13 @@ class InputSuite():
     3. use copybox to write or copy/paste a plain text structure acceptable by pymatgen
     4. use upload_button and file_menu to select from a batch of structure files of potentially mixed types
     """
-    def __init__(self, QueryObj):
-        self.Q = QueryObj
-        # inspection widgets
+    def __init__(self, QueryPanel):
+        self._remoteout = widgets.Output()
+        self._filesout = widgets.Output()
         self.plotout = widgets.Output(layout={'border': '5px solid black'})
-        self.filesout = widgets.Output(layout={'border': '5px solid black'})
-        # remote interface widgets
-        self.remote_menu = qgrid.show_grid(self.Q.frame) #make grid widget with convenience method
-        self.remote_menu.observe(self._process_pick_remote)
+        # remote interface
+        self.QP = QueryPanel
+        setattr(self.QP, "InputSuite", self)
         # write widgets
         self.copybox = widgets.Textarea(
             value="",
@@ -280,24 +296,27 @@ class InputSuite():
             accept='',
             multiple=True,
         )
-        self._get_uploads() #default once
-        self.upload_button.observe(self._get_uploads) #also a callback
-        #widgets.jslink((self.fileout, 'value'), (slider, 'value'))
-        # is there an attribute of an output widget that can be direclty linked with the display contents?
-        # can I get the html from the grid and jsdlink it into the html in the output widget?
+        self._get_uploads() #set default
+        self.upload_button.observe(self._get_uploads, names='value') #also a callback
 
-    #menu callbacks and display handlers
+    #complex display handlers
     @property
-    def files_menu(self):
-        self.files_menu = self.files_frame
-        with self.filesout:
+    def remoteout(self):
+        with self._remoteout:
             clear_output(wait=True)
-            self._files_menu.observe(self._process_pick_file)
-            return self._files_menu
+            self._remote_menu = qgrid.show_grid(self.QP.Q.frame) #make protected grid widget with convenience method
+            self._remote_menu.observe(self._process_pick_remote)
+            display(self._remote_menu)
+        return self._remoteout
 
-    @files_menu.setter
-    def files_menu(self, uploads):
-        self._files_menu = qgrid.show_grid(uploads)
+    @property
+    def filesout(self):
+        with self._filesout:
+            clear_output(wait=True)
+            self._files_menu = qgrid.show_grid(self.files_frame)
+            self._files_menu.observe(self._process_pick_file)
+            display(self._files_menu)
+        return self._filesout
 
     def _get_uploads(self, *args):
         if not self.upload_button.value:
@@ -307,11 +326,12 @@ class InputSuite():
         files = pd.Series(upload_dict)
         files.name = 'file content'
         self.files_frame = files.to_frame()
+        self.filesout
         
     # string parsing utility
     def _induce_format(self, raw_string:str):
         """ pymatgen contains no logic for this, so here is a simple stuffer """
-        sfmt= ThisString(raw_string).format_is()
+        sfmt = ThisString(raw_string).format_is()
         self.struct = Structure.from_str(raw_string,
                                          primitive=False, #only for cifs
                                          sort=False,
@@ -327,23 +347,20 @@ class InputSuite():
 
     def _process_pick_remote(self, event):
         """ callback for menu """
-        grid = self.remote_menu
+        grid = self._remote_menu
         with self.plotout:
             clear_output(wait=True)
-            sid = grid.get_changed_df().at[grid.get_selected_rows()[0],'task_id'] #hardcoded for mp. id key should depend on Q
-            self.struct = self.Q.get_structure(sid)
+            sid = grid.get_changed_df().iloc[grid.get_selected_rows()[0]].loc[self.QP.Q.dbcode_key]
+            self.struct = self.QP.Q.get_structure(sid)
             struct_plot(self.struct)
 
     def _process_pick_file(self, event):
         """ callback for menu """
-        grid = self.files_menu
+        grid = self._files_menu
         with self.plotout:
             clear_output(wait=True)
-
-
-            uploads = grid.get_changed_df().at[grid.get_selected_rows()[0], 0] #not .at for metadata...
-            raw_string = codecs.decode(uploads.value['POSCAR']['content']) #obtain index from selection...^
-            self.struct = self._induce_format()
+            raw_string = grid.get_changed_df().iloc[grid.get_selected_rows()[0], 0]
+            self._induce_format(raw_string)
             struct_plot(self.struct)
 
 class SimSettingSuite():

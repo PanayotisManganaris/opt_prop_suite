@@ -13,6 +13,10 @@
 #+creator: Emacs 27.2 (Org mode 9.5)
 #+cite_export:
 * Overview
+Nanohub based virtual lab for design, execution, and analysis of
+computational experiments testing the optical properties of
+semiconductors. Runs Quantum Espresso DFT code.
+
 This README also serves as a design document and as a log of
 collaboration arrangements
 * Installation for Developers

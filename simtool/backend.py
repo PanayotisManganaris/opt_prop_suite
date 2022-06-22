@@ -23,11 +23,11 @@ import fileinput
 from simtool import DB, parse
 
 #data handling
-from pymatgen.core import Structure, Lattice, Element, Composition
-from pymatgen.io.pwscf import PWInput PWOutput
+from pymatgen.core import Structure, Lattice, Element, Composition, sites
+from pymatgen.io.pwscf import PWInput, PWOutput
 
 #misc tools
-from typing import Any, NoReturn, Tuple, Union
+from typing import Any, NoReturn, Tuple, Union, Callable
 import os
 import re
 import math
@@ -39,7 +39,7 @@ np.set_printoptions(formatter={'float': '{: 0.16f}'.format}, suppress=False)
 import plotly.express as px
 
 def copyAndSaveFileAsOutput(outputVariableName,inputPath):
-    """ saves an ouput variable as a file at inputpath """
+    """ saves an output variable as a file at inputpath """
     if inputPath:
         if inputPath.startswith('file://'):
             resultFile = os.path.basename(inputPath[7:])
@@ -102,6 +102,7 @@ def verify_site_fidelity(struct:Structure)->NoReturn:
 # Can potcar be converted to UPF format?
 
 ## Parse and Prepare Data for Transcription
+#outdated utility?
 def get_constituents(struct:Structure)->list:
     constituent_elements = [element for element in itertools.chain(
         *[site.species.elements for site in struct.sites]
@@ -110,7 +111,7 @@ def get_constituents(struct:Structure)->list:
     return constituent_elements
 
 def order_constituents(struct:Structure)->Tuple[np.ndarray, np.ndarray]:
-    """ sort formula elements and atomic mass by descending atomic mass """
+    """ sort constituent elements and atomic mass by descending atomic mass """
     uniquel = np.unique(get_constituents(struct))
     amass_ar = np.array([el.atomic_mass for el in uniquel])
     massive_first = np.argsort(amass_ar).tolist()[::-1]
@@ -135,6 +136,31 @@ def get_pps(struct:Structure, pp_class:str)->Tuple[list,list]:
     if len(pps) != len(symbols):
         logging.warning(f"There are not as many Pseudopotentials as Species. This may not work")
     return pps #should share order of symbols
+
+## assign information to sites using setters 
+SiteObj = Union[sites.Site, sites.PeriodicSite]
+
+def set_site_properties(struct:Structure,
+                        key:str,
+                        setter:Callable[[SiteObj], Any])->Structure:
+    """
+    Sets a structure's site objects property key to a value obtained by a setter function.
+    
+    """
+    #notice, for multiple elements in a single site (disordered structures)
+    #the appropriate setter will have to make sense of the setter
+    for site in struct.sites:
+        try:
+            site.properties[key] = setter(site)
+        except AttributeError as e:
+            logging.error(e.args)
+    return struct
+
+## setter functions obtain an external data value for any possible value of a given site attribute
+def pseudo_setter(site:SiteObj)->str:
+    symbols = [element.symbol for element in site.species.elements]
+    print(symbols)
+    return 'Test'
 
 ## input printers
 class BlockPrinter():
@@ -228,10 +254,12 @@ class BlockPrinter():
         return kpoints
 
 ## Simulation Pipeline Components
-class NanoHUB_PWInput():
+class NanoHUB_PWInput(PWInput):
     """
-    Inherits PWInput class from pymatgen. Handles setting up pwscf
-    jobs and running them on nanoHUB
+    https://pymatgen.org/pymatgen.io.pwscf.html
+
+    Handles setting up pw.x input files. It is equipped with a submit
+    method for running the resulting job on nanoHUB.
     """
     def __init__(self,
                  struct:Structure,

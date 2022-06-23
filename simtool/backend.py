@@ -122,10 +122,10 @@ def order_constituents(struct:Structure)->Tuple[np.ndarray, np.ndarray]:
     logging.debug(f"Elements ordered by descending mass: {el_falling}. Descending mass: {amass_falling}")
     return el_falling, amass_falling
 
-def get_pps(struct:Structure, ppdb:dict)->list:
+def get_pps(struct:Structure)->list:
     """ identifies pseudopotential files to use in simulation """
     symbols, _ = order_constituents(struct)
-    pps = _lookup_pp(symbols, ppdb)
+    pps = _lookup_pp(symbols, ppdb) #ppdb in global scope
     logging.debug(f"Pseudopotentials in order of descending mass: {pps}")
     if len(pps) != len(symbols):
         logging.warning(f"There are not as many Pseudopotentials as Species. This may not work")
@@ -136,7 +136,6 @@ def _lookup_pp(symbols:list, ppdb:dict)->list:
     for symbol in symbols:
         pps.append(ppdb[symbol])
     return pps
-
 
 ## assign information to sites using setters 
 SiteObj = Union[sites.Site, sites.PeriodicSite]
@@ -158,10 +157,10 @@ def set_site_properties(struct:Structure,
     return struct
 
 ## setter functions obtain an external data value for any possible value of a given site attribute
-def pseudo_setter(site:SiteObj)->str:
+def pseudo_setter(site:SiteObj, ppdb:dict)->list:
     symbols = [element.symbol for element in site.species.elements]
-    
-    return symbols
+    pps = _lookup_pp(symbols, ppdb)
+    return pps
 
 ## input printers
 class BlockPrinter():

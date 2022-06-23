@@ -38,6 +38,8 @@ np.set_printoptions(formatter={'float': '{: 0.16f}'.format}, suppress=False)
 #summary plots
 import plotly.express as px
 
+#db and ppdb instantiated in the simtool global scope.
+
 def copyAndSaveFileAsOutput(outputVariableName,inputPath):
     """ saves an output variable as a file at inputpath """
     if inputPath:
@@ -120,22 +122,21 @@ def order_constituents(struct:Structure)->Tuple[np.ndarray, np.ndarray]:
     logging.debug(f"Elements ordered by descending mass: {el_falling}. Descending mass: {amass_falling}")
     return el_falling, amass_falling
 
-def get_pps(struct:Structure, pp_class:str)->Tuple[list,list]:
+def get_pps(struct:Structure, ppdb:dict)->list:
     """ identifies pseudopotential files to use in simulation """
     symbols, _ = order_constituents(struct)
-    pp_files = os.listdir(f"./pseudo/pseudo_{pp_class}/")
-    logging.info(f'retrieving pseudo-potentials of type {pp_class} for elements: {symbols}')
-    # find corresponding .upf files from pseudo list
-    pps = []
-    for symbol in symbols:
-        for pp in pp_files:
-            identifier = re.split('\.|\_',pp)[0]
-            if symbol == identifier:
-                pps.append(pp)
+    pps = _lookup_pp(symbols, ppdb)
     logging.debug(f"Pseudopotentials in order of descending mass: {pps}")
     if len(pps) != len(symbols):
         logging.warning(f"There are not as many Pseudopotentials as Species. This may not work")
     return pps #should share order of symbols
+
+def _lookup_pp(symbols:list, ppdb:dict)->list:
+    pps = []
+    for symbol in symbols:
+        pps.append(ppdb[symbol])
+    return pps
+
 
 ## assign information to sites using setters 
 SiteObj = Union[sites.Site, sites.PeriodicSite]
@@ -148,7 +149,7 @@ def set_site_properties(struct:Structure,
     
     """
     #notice, for multiple elements in a single site (disordered structures)
-    #the appropriate setter will have to make sense of the setter
+    #the appropriate setter will have to make sense of the listed members
     for site in struct.sites:
         try:
             site.properties[key] = setter(site)
@@ -159,8 +160,8 @@ def set_site_properties(struct:Structure,
 ## setter functions obtain an external data value for any possible value of a given site attribute
 def pseudo_setter(site:SiteObj)->str:
     symbols = [element.symbol for element in site.species.elements]
-    print(symbols)
-    return 'Test'
+    
+    return symbols
 
 ## input printers
 class BlockPrinter():

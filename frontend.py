@@ -214,7 +214,8 @@ class QueryPanel():
             description="Remote Data: ",
             disabled=False,
             button_style="",
-            tooltips=["load a saved query for quick debugging",
+            tooltips=["",
+                      "load a saved query for quick debugging", #comment for release
                       "Contact the Materials Project REST API for semiconductor information"]
         )
         self.Q = FakeQuery() #default

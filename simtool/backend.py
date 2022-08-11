@@ -18,9 +18,9 @@ import shutil
 import subprocess
 
 #nanohub utilities
-import hublib.use
-import fileinput
-from simtool import DB, parse
+# import hublib.use
+# import fileinput
+# from simtool import DB, parse
 
 #data handling
 from pymatgen.core import Structure, Lattice, Element, Composition, sites

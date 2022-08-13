@@ -214,12 +214,13 @@ class QueryPanel():
             description="Remote Data: ",
             disabled=False,
             button_style="",
-            tooltips=["load a saved query for quick debugging",
+            tooltips=["",
+                      "load a saved query for quick debugging", #comment for release
                       "Contact the Materials Project REST API for semiconductor information"]
         )
         self.Q = FakeQuery() #default
         self.toggles.observe(self._assign_data_on_pick, names='value')
-        self.InputSuite = None
+        self.InputSuite = InputSuite(self)
 
     def _assign_data_on_pick(self, change):
         """ observes update to the traitlets bunch """
@@ -269,13 +270,12 @@ class InputSuite():
     3. use copybox to write or copy/paste a plain text structure acceptable by pymatgen
     4. use upload_button and file_menu to select from a batch of structure files of potentially mixed types
     """
-    def __init__(self, QueryPanel):
+    def __init__(self, querypanel):
         self._remoteout = widgets.Output()
         self._filesout = widgets.Output()
         self.plotout = widgets.Output(layout={'border': '5px solid black'})
         # remote interface
-        self.QP = QueryPanel
-        setattr(self.QP, "InputSuite", self)
+        self.qp = querypanel
         # write widgets
         self.copybox = widgets.Textarea(
             value="",
@@ -304,7 +304,7 @@ class InputSuite():
     def remoteout(self):
         with self._remoteout:
             clear_output(wait=True)
-            self._remote_menu = qgrid.show_grid(self.QP.Q.frame) #make protected grid widget with convenience method
+            self._remote_menu = qgrid.show_grid(self.qp.Q.frame) #make protected grid widget with convenience method
             self._remote_menu.observe(self._process_pick_remote)
             display(self._remote_menu)
         return self._remoteout
@@ -350,8 +350,8 @@ class InputSuite():
         grid = self._remote_menu
         with self.plotout:
             clear_output(wait=True)
-            sid = grid.get_changed_df().iloc[grid.get_selected_rows()[0]].loc[self.QP.Q.dbcode_key]
-            self.struct = self.QP.Q.get_structure(sid)
+            sid = grid.get_changed_df().iloc[grid.get_selected_rows()[0]].loc[self.qp.Q.dbcode_key]
+            self.struct = self.qp.Q.get_structure(sid)
             struct_plot(self.struct)
 
     def _process_pick_file(self, event):
